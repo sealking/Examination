@@ -1,28 +1,36 @@
 <template>
-  <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
-  </div>
+	<div>
+		<vueLogin v-if="showLogin"
+				@showIndexPage="showIndexPage"></vueLogin>
+		<vueIndex v-if="showIndex"
+				@showLoginPage="showIndexPage"></vueIndex>
+	</div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
-
-export default {
-  name: 'app',
-  components: {
-    HelloWorld
-  }
-}
+	import vueIndex from './components/vue-index.vue';
+	import vueLogin from './components/vue-login.vue';
+	export default {
+		name: "App",
+		data() {
+			return {
+				showLogin: true,
+				showIndex: false
+			}
+		},
+		methods: {
+			showIndexPage() {
+				this.showIndex = true;
+				this.showLogin = false;
+			},
+			showLoginPage() {
+				this.showLogin = true;
+				this.showIndex = false;
+			}
+		},
+		components: {
+			vueIndex,
+			vueLogin
+		}
+	}
 </script>
-
-<style>
-#app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
-</style>
