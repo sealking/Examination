@@ -1,36 +1,74 @@
 <template>
 	<div>
-		<vueLogin v-if="showLogin"
-				@showIndexPage="showIndexPage"></vueLogin>
-		<vueIndex v-if="showIndex"
-				@showLoginPage="showIndexPage"></vueIndex>
+		<vueLogin v-if="showLogin" @showLoginConfirmPage="showLoginConfirmPage"></vueLogin>
+		<vueLoginConfirm v-if="showLoginConfirm" @showMockQuestionSelectPage="showMockQuestionSelectPage" @showIndexPage="showIndexPage"></vueLoginConfirm>
+		<vueMockQuestionSelect v-if="showMockQuestionSelect" @showIndexPage="showIndexPage"></vueMockQuestionSelect>
+		<vueIndex v-if="showIndex" @showScoreConfirmPage="showScoreConfirmPage"></vueIndex>
+		<vueScoreConfirm v-if="showScoreConfirm" @showLoginPage="showLoginPage"></vueScoreConfirm>
 	</div>
 </template>
 
 <script>
-	import vueIndex from './components/vue-index.vue';
 	import vueLogin from './components/vue-login.vue';
+	import vueLoginConfirm from './components/vue-loginConfirm.vue';
+	import vueMockQuestionSelect from './components/vue-mockQuestionSelect.vue';
+	import vueIndex from './components/vue-index.vue';
+	import vueScoreConfirm from './components/vue-scoreConfirm.vue';
+
 	export default {
 		name: "App",
 		data() {
 			return {
 				showLogin: true,
-				showIndex: false
+				showLoginConfirm: false,
+				showMockQuestionSelect: false,
+				showIndex: false,
+				showScoreConfirm: false
 			}
 		},
 		methods: {
-			showIndexPage() {
-				this.showIndex = true;
-				this.showLogin = false;
-			},
 			showLoginPage() {
 				this.showLogin = true;
+				this.showLoginConfirm = false;
+				this.showMockQuestionSelect = false,
 				this.showIndex = false;
+				this.showScoreConfirm = false;
+			},
+			showLoginConfirmPage() {
+				this.showLogin = false;
+				this.showLoginConfirm = true;
+				this.showMockQuestionSelect = false,
+				this.showIndex = false;
+				this.showScoreConfirm = false;
+			},
+			showMockQuestionSelectPage() {
+				this.showLogin = false;
+				this.showLoginConfirm = false;
+				this.showMockQuestionSelect = true,
+				this.showIndex = false;
+				this.showScoreConfirm = false;
+			},
+			showIndexPage() {
+				this.showLogin = false;
+				this.showLoginConfirm = false;
+				this.showMockQuestionSelect = false,
+				this.showIndex = true;
+				this.showScoreConfirm = false;
+			},
+			showScoreConfirmPage() {
+				this.showLogin = false;
+				this.showLoginConfirm = false;
+				this.showMockQuestionSelect = false,
+				this.showIndex = false;
+				this.showScoreConfirm = true;
 			}
 		},
 		components: {
+			vueLogin,
+			vueLoginConfirm,
+			vueMockQuestionSelect,
 			vueIndex,
-			vueLogin
+			vueScoreConfirm
 		}
 	}
 </script>

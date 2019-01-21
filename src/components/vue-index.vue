@@ -1,12 +1,5 @@
 <template>
 	<div v-loading="loading" element-loading-text="正在出题中...">
-		<el-row >
-			<el-col :span="18" :offset="3">
-				<div>姓名：杨晰</div>
-				<div>性别：男</div>
-				<div>身份证号：370303198512021012</div>
-			</el-col>
-		</el-row>
 		<el-row class="title">
 			<el-col :span="18" :offset="3">
 				总计:{{totalNumber}}&nbsp;已答:{{answerNumber}}&nbsp;正确:{{rightNumber}}&nbsp;错误:{{answerNumber - rightNumber}}
@@ -59,18 +52,18 @@
 			</el-row>
 			<el-row class="answer" v-if="item.questionType === '2' || item.questionType === '4'">
 				<el-col :span="18" :offset="3">
-					<el-button class="submit-btn" @click="getResult(index)" :disabled="item.finish">提交</el-button>
+					<el-button class="submit-btn" @click="getResult(index)" :disabled="item.finish">确认</el-button>
 				</el-col>
 			</el-row>
 			<el-row class="answer" v-if="item.finish">
 				<el-col :span="18" :offset="3" v-if="item.questionType === '1' || item.questionType === '4'">
 					<div class="right" v-if="item.answer === item.choice">回答正确</div>
-					<div class="false" v-if="item.answer !== item.choice">回答错误，正确答案为【{{item.answer}}】</div>
+					<div class="false" v-if="item.answer !== item.choice">回答错误<span v-if="examinationType === '2'">，正确答案为【{{item.answer}}】</span></div>
 				</el-col>
 
 				<el-col :span="18" :offset="3" v-if="item.questionType === '2' ">
 					<div class="right" v-if="item.answer === item.checkboxInfo.sort().join(',')">回答正确</div>
-					<div class="false" v-if="item.answer !== item.checkboxInfo.sort().join(',')">回答错误，正确答案为【{{item.answer}}】</div>
+					<div class="false" v-if="item.answer !== item.checkboxInfo.sort().join(',')">回答错误<span v-if="examinationType === '2'">，正确答案为【{{item.answer}}】</span></div>
 				</el-col>
 
 				<el-col :span="18" :offset="3" v-if="item.questionType === '3' ">
@@ -82,6 +75,7 @@
 				<el-col :span="18" :offset="3">
 					<el-button  type="primary" @click="upBtnClick()" :disabled="upBtnFlg">上一题</el-button>
 					<el-button  type="primary" @click="downBtnClick()" :disabled="downBtnFlg">下一题</el-button>
+					<el-button  v-if="totalNumber === answerNumber" type="primary" @click="submitClick()">提交</el-button>
 				</el-col>
 			</el-row>
 		</div>
@@ -90,31 +84,46 @@
 
 <script>
 	export default {
-		name: "vue-index",
 		data() {
 			return {
-				minute: 20,
+				minute: 0,
 				seconds: 0,
 				timer: null,
 				totalNumber: 0,
 				answerNumber: 0,
 				rightNumber: 0,
+				score: 0,
 				loading: true,
 				getQuestionUrl: "/examination/getQuestion",
 				questiones: [],
 				item: "",
 				index:0,
 				upBtnFlg: true,
-				downBtnFlg: true
+				downBtnFlg: true,
+				examinationType : localStorage.getItem("examinationType")
 			}
 		},
 		methods: {
-			//弹窗函数
-			messageAlert( msg) {
-				this.$message(msg);
+			messageAlert(msg, type) {
+				if(type === 'success' || type === 'warning') {
+					this.$message({
+						message: msg,
+						type: type
+					});
+				} else if(type === 'error'){
+					this.$message.error(msg);
+				} else {
+					this.$message(msg);
+				}
+				
+			},
+			MessageBoxAlert(title, msg) {
+				this.$alert(msg, title, {
+					confirmButtonText: '确定',
+				});
 			},
 
-			//提交答案函数
+			// 确认答案函数
 			getResult(index) {
 				// 显示正确错误之前，上一题和下一题按钮不可用
 				var upBtnFlgTemp = this.upBtnFlg;
@@ -122,25 +131,33 @@
 				this.upBtnFlg = false;
 				this.downBtnFlg = false;
 
-				this.questiones[index].finish = true;
-				this.questiones[index].answerFlg = true;
 				if(this.item.questionType === '1' || this.item.questionType === '3' || this.item.questionType === '4') {
-					this.questiones[index].choiceTemp = this.questiones[index].choice
-					if(this.questiones[index].choice === this.questiones[index].answer) {
+					if(!this.item.choice) {
+						this.messageAlert('请填写答案', 'error');
+						return;
+					}
+					this.item.choiceTemp = this.item.choice
+					if(this.item.choice === this.item.answer) {
 						this.rightNumber++;
+						this.score += this.item.score;
 					}
 					this.answerNumber++;
 				} else if(this.item.questionType === '2') {
-					this.questiones[index].checkboxInfoTemp = this.questiones[index].checkboxInfo;
-					if(this.questiones[index].checkboxInfo.sort().join(',') === this.questiones[index].answer) {
+					if(this.item.checkboxInfo.length < 1) {
+						this.messageAlert('请选择答案', 'error');
+						return;
+					}
+					this.item.checkboxInfoTemp = this.item.checkboxInfo;
+					if(this.item.checkboxInfo.sort().join(',') === this.item.answer) {
 						this.rightNumber++;
+						this.score += this.item.score;
 					}
 					this.answerNumber++;
-				} else if(this.item.questionType === '4'){
-
 				}
-				
 
+				this.item.finish = true;
+				this.item.answerFlg = true;
+				
 				this.upBtnFlg = upBtnFlgTemp;
 				this.downBtnFlg = downBtnFlgTemp;
 
@@ -150,7 +167,7 @@
 			upBtnClick() {
 				var indexTemp = this.index;
 				if(!this.questiones[indexTemp].answerFlg) {
-					this.$message("请先提交本题答案");
+					this.messageAlert('请选择答案', 'error');
 					return;
 				}
 				this.downBtnFlg = false;
@@ -187,7 +204,7 @@
 			downBtnClick() {
 				var indexTemp = this.index;
 				if(!this.questiones[indexTemp].answerFlg) {
-					this.$message("请先提交本题答案");
+					this.messageAlert('请选择答案', 'error');
 					return;
 				}
 				this.upBtnFlg = false;
@@ -217,6 +234,10 @@
 				} else if(this.item.questionType === '4'){
 
 				}
+			},
+			submitClick() {
+				localStorage.setItem("score",this.score);
+				this.$emit('showScoreConfirmPage');
 			}
 		},
 		computed: {
@@ -231,56 +252,46 @@
 		},
 		mounted() {
 			// 获取题目
-			this.postAxios(this.getQuestionUrl).then(data => {
-				if(data.returnCode === '0') {
-					if(data.list.length > 0) {
-						this.questiones = data.list;
-						this.totalNumber = this.questiones.length;
+			console.log(localStorage.getItem("questionInfoList"));
+			this.questiones = JSON.parse(localStorage.getItem("questionInfoList"));
+			this.totalNumber = this.questiones.length;
 
-						// 初始化多选的的数据数组
-						this.questiones.forEach(itemTemp => {
-      						itemTemp.checkboxInfo = [];
-						})
+			// 初始化多选的的数据数组
+			this.questiones.forEach(itemTemp => {
+      			itemTemp.checkboxInfo = [];
+			})
+			this.loading = false;
+			this.index = 0;
+			this.item = this.questiones[this.index];
 
-						this.minute = data.examinationMinute;
-						this.seconds = data.examinationSeconds;
-						this.loading = false;
-						this.index = 0;
-						this.item = this.questiones[this.index];
-
-						if(this.questiones.length === 1) {
-							this.downBtnFlg = true;
-						} else {
-							this.downBtnFlg = false;
-						}
-						this.upBtnFlg = true;
+			if(this.questiones.length === 1) {
+				this.downBtnFlg = true;
+			} else {
+				this.downBtnFlg = false;
+			}
+			this.upBtnFlg = true;
 						
-						// 定时器
-						var _this = this;
-						this.timer = setInterval(function() {
-							if(_this.minute === 0 && _this.seconds === 0) {
-								clearInterval(_this.timer);
-								_this.questiones.map((item, index, array) => {
-									_this.questiones[index].finish = true;
-								});
-								_this.postScore();
-									return;
-							}
-							if(_this.seconds === 0) {
-								_this.minute--;
-								_this.seconds = 59;
-							}else{
-								_this.seconds--;
-							}
-						},1000);
-					} else {
-						this.messageAlert('获取题目数量为零');
-					}
+			// 定时器
+			this.minute = localStorage.getItem("examinationMinute");
+			this.seconds = 0;
+			var _this = this;
+			this.timer = setInterval(function() {
+				if(_this.minute === 0 && _this.seconds === 0) {
+					clearInterval(_this.timer);
+					_this.questiones.map((item, index, array) => {
+						_this.questiones[index].finish = true;
+					});
+					_this.postScore();
+						return;
 				}
-			}).catch(err => {
-				this.messageAlert('出现异常');
-			});
-		}
+				if(_this.seconds === 0) {
+					_this.minute--;
+					_this.seconds = 59;
+				}else{
+					_this.seconds--;
+				}
+			},1000);
+		}	
 	}
 </script>
 <style lang="less">
