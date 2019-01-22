@@ -1,6 +1,8 @@
 <template>
 	<div>
-		<vueLogin v-if="showLogin" @showLoginConfirmPage="showLoginConfirmPage"></vueLogin>
+		
+		<vueLogin v-if="showLogin" @showLoginConfirmPage="showLoginConfirmPage" @showOfflinePage="showOfflinePage"></vueLogin>
+		<vueOffline v-if="showOffline" @showIndexPage="showIndexPage"></vueOffline>
 		<vueLoginConfirm v-if="showLoginConfirm" @showMockQuestionSelectPage="showMockQuestionSelectPage" @showIndexPage="showIndexPage"></vueLoginConfirm>
 		<vueMockQuestionSelect v-if="showMockQuestionSelect" @showIndexPage="showIndexPage"></vueMockQuestionSelect>
 		<vueIndex v-if="showIndex" @showScoreConfirmPage="showScoreConfirmPage"></vueIndex>
@@ -14,6 +16,7 @@
 	import vueMockQuestionSelect from './components/vue-mockQuestionSelect.vue';
 	import vueIndex from './components/vue-index.vue';
 	import vueScoreConfirm from './components/vue-scoreConfirm.vue';
+	import vueOffline from './components/vue-offline.vue'
 
 	export default {
 		name: "App",
@@ -23,7 +26,8 @@
 				showLoginConfirm: false,
 				showMockQuestionSelect: false,
 				showIndex: false,
-				showScoreConfirm: false
+				showScoreConfirm: false,
+				showOffline: false
 			}
 		},
 		methods: {
@@ -33,6 +37,7 @@
 				this.showMockQuestionSelect = false,
 				this.showIndex = false;
 				this.showScoreConfirm = false;
+				this.showOffline = false;
 			},
 			showLoginConfirmPage() {
 				this.showLogin = false;
@@ -40,6 +45,7 @@
 				this.showMockQuestionSelect = false,
 				this.showIndex = false;
 				this.showScoreConfirm = false;
+				this.showOffline = false;
 			},
 			showMockQuestionSelectPage() {
 				this.showLogin = false;
@@ -47,6 +53,7 @@
 				this.showMockQuestionSelect = true,
 				this.showIndex = false;
 				this.showScoreConfirm = false;
+				this.showOffline = false;
 			},
 			showIndexPage() {
 				this.showLogin = false;
@@ -54,6 +61,7 @@
 				this.showMockQuestionSelect = false,
 				this.showIndex = true;
 				this.showScoreConfirm = false;
+				this.showOffline = false;
 			},
 			showScoreConfirmPage() {
 				this.showLogin = false;
@@ -61,6 +69,15 @@
 				this.showMockQuestionSelect = false,
 				this.showIndex = false;
 				this.showScoreConfirm = true;
+				this.showOffline = false;
+			},
+			showOfflinePage() {
+				this.showLogin = false;
+				this.showLoginConfirm = false;
+				this.showMockQuestionSelect = false,
+				this.showIndex = false;
+				this.showScoreConfirm = false;
+				this.showOffline = true;
 			}
 		},
 		components: {
@@ -68,7 +85,8 @@
 			vueLoginConfirm,
 			vueMockQuestionSelect,
 			vueIndex,
-			vueScoreConfirm
+			vueScoreConfirm,
+			vueOffline
 		}
 	}
 </script>
