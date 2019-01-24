@@ -16,7 +16,7 @@
 				<input type="hidden" v-model="hiddenData" >
 			</el-col>
 		</el-row>
-		<div class="exam-question">
+		<div v-if="questiones.length !== 0" class="exam-question">
 			<el-row>
 				<el-col :span="18" :offset="3" v-if="item.questionType === '1'">
 					<div class="question">单选题</div>
@@ -77,14 +77,14 @@
 					<div class="false" v-if="item.answer !== item.choice">回答错误</div>
 				</el-col>
 			</el-row>
-			<el-row class="answer" v-if="questiones.length !== 0">
+			<el-row class="answer" >
 				<el-col :span="18" :offset="3">
 					{{index + 1}}/{{totalNumber}}
 					<el-input  v-model="questionsNo" type="text" placeholder="请输入题号"></el-input>
 					<el-button type="primary" @click="gotoQuestions()">跳转</el-button>
 				</el-col>
 			</el-row>
-			<el-row class="answer" v-if="questiones.length !== 0">
+			<el-row class="answer" >
 				<el-col :span="18" :offset="3">
 					<el-button  type="primary" @click="upBtnClick()" :disabled="upBtnFlg">上一题</el-button>
 					<el-button  type="primary" @click="downBtnClick()" :disabled="downBtnFlg">下一题</el-button>
@@ -212,17 +212,23 @@
 				this.hiddenData++;
 			},
 			questionsTypeOnChange(){
-				for(var i = 0; i < this.allquestions.length; i++) {
-					if(this.questionsType === this.allquestions[i].questionType) {
-						this.questiones = this.allquestions[i].questionInfoList;
-						break;
+				if(this.allquestions.length > 0) {
+					for(var i = 0; i < this.allquestions.length; i++) {
+						if(this.questionsType === this.allquestions[i].questionType) {
+							this.questiones = this.allquestions[i].questionInfoList;
+							break;
+						}
+						if(i === this.allquestions.length - 1) {
+							this.questiones = [];
+						}
 					}
-					if(i === this.allquestions.length - 1) {
-						this.questiones = [];
+					if(this.questiones.length === 0) {
 						Toast('你选择的题目类别没有试题，请同步');
-						return;
 					}
+				} else {
+					Toast('题库未同步，请同步');
 				}
+				
 				
 				this.totalNumber = this.questiones.length;
 

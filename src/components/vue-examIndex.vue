@@ -18,7 +18,7 @@
 					<div class="question">{{item.questionContent}}</div>
 					<div v-for="itemInfo in item.itemInfoList" :key="itemInfo" class="question">{{itemInfo}}</div>
 
-					<el-radio-group v-model="item.choice" :disabled="item.finish" @change="getResult(index)">
+					<el-radio-group v-model="item.choice" :disabled="item.finish" @change="getResult()">
 						<el-radio v-for="itemIndexInfo in item.itemList" :key="itemIndexInfo" :label="itemIndexInfo">
 							{{itemIndexInfo}}
 						</el-radio>
@@ -39,7 +39,7 @@
 					<div class="question">判断题</div>
 					<div class="question">{{item.questionContent}}</div>
 					
-					<el-radio-group v-model="item.choice" :disabled="item.finish" @change="getResult(index)">
+					<el-radio-group v-model="item.choice" :disabled="item.finish" @change="getResult()">
 						<el-radio :key="'A'" :label="'A'">正确</el-radio>
 						<el-radio :key="'B'" :label="'B'">错误</el-radio>
 					</el-radio-group>
@@ -53,7 +53,7 @@
 			</el-row>
 			<el-row class="answer" v-if="item.questionType === '2' || item.questionType === '4'">
 				<el-col :span="18" :offset="3">
-					<el-button class="submit-btn" @click="getResult(index)" :disabled="item.finish">确认</el-button>
+					<el-button class="submit-btn" @click="getResult()" :disabled="item.finish">确认</el-button>
 				</el-col>
 			</el-row>
 			<el-row class="answer" v-if="item.finish">
@@ -86,6 +86,7 @@
 <script>
 	import { Toast } from 'mint-ui';
 	import { MessageBox } from 'mint-ui';
+	
 	export default {
 		data() {
 			return {
@@ -109,7 +110,7 @@
 		},
 		methods: {
 			// 确认答案函数
-			getResult(index) {
+			getResult() {
 				// 显示正确错误之前，上一题和下一题按钮不可用
 				var upBtnFlgTemp = this.upBtnFlg;
 				var downBtnFlgTemp = this.downBtnFlg;
@@ -222,9 +223,10 @@
 					message: '试题未全部作答，是否提交',
 					showConfirmButton: true,
 					showCancelButton: true
-					}).then(action => {
-						if (action == 'confirm') {    //确认的回调
-							if(this.examinationType === '1') {
+					})
+					.then(action => {
+ 						if (action == 'confirm') { //确认的回调
+ 							if(this.examinationType === '1') {
 								let option = {
 									stuNo: localStorage.getItem("studentNo"),
 									examNo: localStorage.getItem("examinationNo"),
@@ -233,14 +235,17 @@
 								// 提交分数
 								this.postAxios(this.updateScoreUrl,option).then(data => {
 									localStorage.setItem("score", this.score);
-									this.$emit('showScoreConfirmPage');
-								}).catch(postErr => {
+									this.$router.push('scoreConfirm');
+								}).catch(err => {
 									Toast('出现异常');
 								});
+							} else {
+								localStorage.setItem("score", this.score);
+								this.$router.push('scoreConfirm');
 							}
 						}
  					}).catch(err => { 
-
+						Toast('出现异常');
  					});
 				}
 			},
@@ -260,6 +265,7 @@
 		},
 		mounted() {
 			// 获取题目
+			this.questiones = [];
 			this.questiones = JSON.parse(localStorage.getItem("questionInfoList"));
 			this.totalNumber = this.questiones.length;
 

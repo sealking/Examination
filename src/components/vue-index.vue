@@ -12,6 +12,7 @@
 </template>
 <script>
 	import { Toast } from 'mint-ui';
+	import { Indicator } from 'mint-ui';
 
 	export default {
 		data() {
@@ -66,7 +67,7 @@
 
 							// 考试类型（1：在线考试，2：模拟考试）
 							localStorage.setItem("examinationType",'1');
-							this.$emit('showExamConfirmPage');
+							this.$router.push('/examConfirm');
 						} else {
 							Toast("您已经参加过该考试");
 						}
@@ -84,16 +85,17 @@
 				localStorage.setItem("examinationType",'2');
 				// 清空工种岗位
 				localStorage.setItem("workType",'');
-				this.$emit('showExamConfirmPage');
+				this.$router.push('/examConfirm');
 			},
 
 			// 离线学习
 			offlineExam() {
-				this.$emit('showOfflinePage');
+				this.$router.push('/offline');
 			},
 
 			// 试题同步
 			offlineSyn() {
+				Indicator.open('加载中...');
 				this.postAxios(this.offlineSynUrl).then(data => {
 					localStorage.setItem("offlineQuestions",JSON.stringify(data));
 					if(JSON.stringify(data).length > 0) {
@@ -101,9 +103,40 @@
 					} else {
 						Toast("同步失败，请检查服务器数据");
 					}
+					Indicator.close();
 				}).catch(err => {
 					Toast('出现异常', 'error');
+					Indicator.close();
 				});
+			},
+			exit() {
+				// 学员编号
+				localStorage.setItem("studentNo", '');
+				// 设置用户的身份证号
+				localStorage.setItem("userIdcard",'');
+				// 设置姓名
+				localStorage.setItem("userName",'');
+				// 设置所属单位
+				localStorage.setItem("userUnits",'');
+				// 试题信息
+				localStorage.setItem("questionInfoList",JSON.stringify([]));
+				// 考试分钟数
+				localStorage.setItem("examinationMinute",0);
+				// 培训编号
+				localStorage.setItem("trainNo",'');
+				// 考试编号
+				localStorage.setItem("examinationNo",'');
+				// 工种岗位
+				localStorage.setItem("workType",'');
+				// 培训类别
+				localStorage.setItem("trainType",'');
+				// 培训层次
+				localStorage.setItem("trainLevel",'');
+				// 考试类型（1：在线考试，2：模拟考试）
+				localStorage.setItem("examinationType",'');
+				// 分数
+				localStorage.setItem("score", 0);
+				this.$router.push('/login');
 			}
 		}
 	}

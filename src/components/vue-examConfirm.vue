@@ -95,12 +95,12 @@
 				}).catch(err => {
 					Toast('出现异常');
 				});
-				this.$emit('showExamIndexPage');
+				this.$router.replace('/examIndex');
 			},
 			mockOnClick() {
 				if(this.dataValid()) {
 					localStorage.setItem("workType",this.workType);
-					this.$emit('showMockQuestionSelectPage');
+					this.$router.push('mockQuestionSelect');
 				}
 			},
 

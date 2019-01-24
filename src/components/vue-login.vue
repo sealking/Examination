@@ -50,7 +50,7 @@
 						// 设置所属单位
 						localStorage.setItem("userUnits",data.units);
 						// 跳转到登录确认页面
-						this.$emit('showIndexPage');
+						this.$router.replace ('/');
 					}else{
 						Toast(data.msg,);
 					}
@@ -59,7 +59,7 @@
 				});
 			},
 			offlineLogin() {
-				this.$emit('showOfflinePage');
+				this.$router.push('offline');
 			}
 		}
 	}

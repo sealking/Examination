@@ -18,7 +18,7 @@
 		},
 		methods: {
 			submitClick() {
-				this.$emit('showIndexPage');
+				this.$router.push('/');
 			}
 		}
 	}

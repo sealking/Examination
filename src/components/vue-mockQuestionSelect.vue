@@ -48,7 +48,7 @@
 						localStorage.setItem("questionInfoList",JSON.stringify(data.questionInfoList));
 						// 考试分钟数
 						localStorage.setItem("examinationMinute",data.examinationMinute);
-						this.$emit('showExamIndexPage');
+						this.$router.replace('examIndex');
 					} else {
 						Toast(data.msg);
 					}
@@ -73,7 +73,7 @@
 							localStorage.setItem("questionInfoList",JSON.stringify(data.questionInfoList));
 							// 考试分钟数
 							localStorage.setItem("examinationMinute",data.examinationMinute);
-							this.$emit('showExamIndexPage');
+							this.$router.replace('examIndex');
 						} else {
 							Toast(data.msg);
 						}

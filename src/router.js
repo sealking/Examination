@@ -7,17 +7,39 @@ Vue.use(Router)
 export default new Router({
   routes: [
     {
-      path: '/',
-      name: 'home',
-      //component: Home
+      path: '/login',
+      name: 'vue-login.vue',
+      component: () => import('./components/vue-login.vue')
     },
     {
-      path: '/about',
-      name: 'about',
-      // route level code-splitting
-      // this generates a separate chunk (about.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
-      //component: () => import(/* webpackChunkName: "about" */ './views/About.vue')
+      path: '/',
+      name: 'index',
+      component: () => import('./components/vue-index.vue')
+    },
+    {
+      path: '/offline',
+      name: 'offline',
+      component: () => import('./components/vue-offline.vue')
+    },
+    {
+      path: '/examConfirm',
+      name: 'examConfirm',
+      component: () => import('./components/vue-examConfirm.vue')
+    },
+    {
+      path: '/examIndex',
+      name: 'examIndex',
+      component: () => import('./components/vue-examIndex.vue')
+    },
+    {
+      path: '/mockQuestionSelect',
+      name: 'mockQuestionSelect',
+      component: () => import('./components/vue-mockQuestionSelect.vue')
+    },
+    {
+      path: '/scoreConfirm',
+      name: 'scoreConfirm',
+      component: () => import('./components/vue-scoreConfirm.vue')
     }
   ]
 })
