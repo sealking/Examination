@@ -17,26 +17,8 @@
 			}
 		},
 		methods: {
-			messageAlert(msg, type) {
-				if(type === 'success' || type === 'warning') {
-					this.$message({
-						message: msg,
-						type: type
-					});
-				} else if(type === 'error'){
-					this.$message.error(msg);
-				} else {
-					this.$message(msg);
-				}
-				
-			},
-			MessageBoxAlert(title, msg) {
-				this.$alert(msg, title, {
-					confirmButtonText: '确定',
-				});
-			},
 			submitClick() {
-				this.$emit('showLoginPage');
+				this.$emit('showIndexPage');
 			}
 		}
 	}

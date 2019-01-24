@@ -18,6 +18,7 @@
 	</div>
 </template>
 <script>
+	import { Toast } from 'mint-ui';
 	export default {
 		data() {
 			return {
@@ -30,24 +31,6 @@
 			}
 		},
 		methods: {
-			messageAlert(msg, type) {
-				if(type === 'success' || type === 'warning') {
-					this.$message({
-						message: msg,
-						type: type
-					});
-				} else if(type === 'error'){
-					this.$message.error(msg);
-				} else {
-					this.$message(msg);
-				}
-				
-			},
-			MessageBoxAlert(title, msg) {
-				this.$alert(msg, title, {
-					confirmButtonText: '确定',
-				});
-			},
 			handleCurrentChange(val) {
 				this.currentRow = val;
 			},
@@ -65,18 +48,18 @@
 						localStorage.setItem("questionInfoList",JSON.stringify(data.questionInfoList));
 						// 考试分钟数
 						localStorage.setItem("examinationMinute",data.examinationMinute);
-						this.$emit('showIndexPage');
+						this.$emit('showExamIndexPage');
 					} else {
-						this.messageAlert(data.msg, 'error');
+						Toast(data.msg);
 					}
 				}).catch(err => {
-					this.messageAlert('出现异常', 'error');
+					Toast('出现异常');
 				});
 			},
 			selectOnClick() {
 
 				if(this.currentRow === null) {
-					this.messageAlert('请选择相应的试题', 'error');
+					Toast('请选择相应的试题');
 				} else {
 					let parms = {
 						studentNo: this.currentRow.studentNo,
@@ -90,12 +73,12 @@
 							localStorage.setItem("questionInfoList",JSON.stringify(data.questionInfoList));
 							// 考试分钟数
 							localStorage.setItem("examinationMinute",data.examinationMinute);
-							this.$emit('showIndexPage');
+							this.$emit('showExamIndexPage');
 						} else {
-							this.messageAlert(data.msg, 'error');
+							Toast(data.msg);
 						}
 					}).catch(err => {
-						this.messageAlert('出现异常', 'error');
+						Toast('出现异常');
 					});
 
 
@@ -115,7 +98,7 @@
 					this.mockExamTableData = data;
 					console.log(this.mockExamTableData);
 				}).catch(err => {
-					this.messageAlert('出现异常', 'error');
+					Toast('出现异常');
 				});
 		}
 	}

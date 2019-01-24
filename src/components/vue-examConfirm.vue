@@ -2,10 +2,8 @@
 	<div>
 		<el-row >
 			<el-col :span="18" :offset="3">
-				<div>身份证号：{{userIdcard}}</div>
-				<div>所属单位：{{userUnits}}</div>
 				<div>培训类别：
-					<el-select v-model="trainingType">
+					<el-select v-model="trainingType" :disabled="examinationType === '1'">
 						<el-option
 							v-for="item in trainingTypeOptions"
 							:key="item.typeDetailCode"
@@ -15,7 +13,7 @@
 					</el-select>
 				</div>
 				<div>培训层次：
-					<el-select v-model="trainingLevel">
+					<el-select v-model="trainingLevel" :disabled="examinationType === '1'">
 						<el-option
 							v-for="item in trainingLevelOptions"
 							:key="item.typeDetailCode"
@@ -25,7 +23,7 @@
 					</el-select>
 				</div>
 				<div>工种岗位：
-					<el-select v-model="workType" @change="workTypeOnchange()">
+					<el-select v-model="workType" @change="workTypeOnchange()" :disabled="examinationType === '1'">
 						<el-option
 							v-for="item in workTypeOptions"
 							:key="item.typeDetailCode"
@@ -39,22 +37,19 @@
 		</el-row>
 		<el-row class="answer">
 			<el-col :span="18" :offset="3">
-				<el-button  v-if="questionType === '1'" type="primary" @click="onlineOnClick()" >在线考试</el-button>
-				<el-button  type="primary" @click="mockOnClick()" >模拟考试</el-button>
+				<el-button  v-if="examinationType === '1'" type="primary" @click="onlineOnClick()" >在线考试</el-button>
+				<el-button  v-if="examinationType === '2'" type="primary" @click="mockOnClick()" >模拟考试</el-button>
 			</el-col>
 		</el-row>
 	</div>
 </template>
 <script>
+	import { Toast } from 'mint-ui';
 	export default {
 		data() {
 			return {
-				// 身份证号码
-				userIdcard: localStorage.getItem("userIdcard"),
-				// 所属单位
-				userUnits: localStorage.getItem("userUnits"),
-				// 试题类型（1：在线试题，2：离线试题）
-				questionType: localStorage.getItem("questionType"),
+				// 考试类型（1：在线考试，2：模拟考试）
+				examinationType: localStorage.getItem("examinationType"),
 				// 培训类别Options
 				trainingTypeOptions: [],
 				// 培训层次Options
@@ -69,64 +64,41 @@
 				workType: "",
 				// 题库种类
 				questionsType: "",
-				loginConfirmUrl: "/login/userLogin",
 				getDataTypeInfoUrl: "/common/getDataTypeInfo",
 				getQuestionsTypeUrl: "/examination/getQuestionsType",
-				getQuestionsUrl: "/examination/getQuestions"
+				updateExamFlagUrl: "/examination/updateIsExamFlag",
+				updateScoreUrl: "/examination/updateScore"
 			}
 		},
 		methods: {
-			messageAlert(msg, type) {
-				if(type === 'success' || type === 'warning') {
-					this.$message({
-						message: msg,
-						type: type
-					});
-				} else if(type === 'error'){
-					this.$message.error(msg);
-				} else {
-					this.$message(msg);
-				}
-				
-			},
-			MessageBoxAlert(title, msg) {
-				this.$alert(msg, title, {
-					confirmButtonText: '确定',
-				});
-			},
 			workTypeOnchange() {
 				// 获取题库种类
 				this.postAxios(this.getQuestionsTypeUrl, {workTypeCode: this.workType}).then(data => {
 					this.questionsType = data.questionsType;
 				}).catch(err => {
-					this.messageAlert('出现异常', 'error');
+					Toast('出现异常');
 				});
 			},
 			onlineOnClick() {
-				let parms = {
-					examinationType: "1",
-					studentNo: localStorage.getItem("studentNo"),
-					questionType: localStorage.getItem("questionType")
-				};
-
-				localStorage.setItem("examinationType","1");
-				this.postAxios(this.getQuestionsUrl, parms).then(data => {
-					if(data.returnCode === '0') {
-						// 试题信息
-						localStorage.setItem("questionInfoList",JSON.stringify(data.questionInfoList));
-						// 考试分钟数
-						localStorage.setItem("examinationMinute",data.examinationMinute);
-						this.$emit('showIndexPage');
-					} else {
-						this.messageAlert(data.msg, 'error');
-					}
+				// 更新成绩表中的是否考试Flg
+				let option = {
+					stuNo: localStorage.getItem("studentNo"),
+					examNo: localStorage.getItem("examinationNo"),
+					score: 0
+				}
+				this.postAxios(this.updateExamFlagUrl, option).then(data => {
 				}).catch(err => {
-					this.messageAlert('出现异常', 'error');
+					Toast('出现异常');
 				});
+				// 初始化成绩表中的成绩
+				this.postAxios(this.updateScoreUrl, option).then(data => {
+				}).catch(err => {
+					Toast('出现异常');
+				});
+				this.$emit('showExamIndexPage');
 			},
 			mockOnClick() {
 				if(this.dataValid()) {
-					localStorage.setItem("examinationType","2");
 					localStorage.setItem("workType",this.workType);
 					this.$emit('showMockQuestionSelectPage');
 				}
@@ -134,7 +106,7 @@
 
 			dataValid() {
 				if(this.workType === "") {
-					this.messageAlert('工种岗位不能为空，请选择', 'error');
+					Toast('工种岗位不能为空，请选择');
 					return false;
 				}
 				return true;
@@ -145,7 +117,7 @@
 			this.postAxios(this.getDataTypeInfoUrl, {typeCode: 'pxlb'}).then(data => {
 				this.trainingTypeOptions = data.dataTypeList;
 			}).catch(err => {
-				this.messageAlert('出现异常', 'error');
+				Toast('出现异常');
 			});
 
 			
@@ -154,17 +126,31 @@
 				this.trainingLevelOptions = data.dataTypeList;
 
 			}).catch(err => {
-				this.messageAlert('出现异常', 'error');
+				Toast('出现异常');
 			});
 
 			// 获取工种
 			this.postAxios(this.getDataTypeInfoUrl, {typeCode: 'gz'}).then(data => {
 				this.workTypeOptions= data.dataTypeList;
 			}).catch(err => {
-				this.messageAlert('出现异常', 'error');
+				Toast('出现异常');
 			});
+			
+			// 在线考试
+			if(this.examinationType === '1') {
+				this.trainingType = localStorage.getItem("trainType");
+				this.trainingLevel = localStorage.getItem("trainLevel");
+				this.workType = localStorage.getItem("workType");
+
+				// 获取题库种类
+				this.postAxios(this.getQuestionsTypeUrl, {workTypeCode: this.workType}).then(data => {
+					this.questionsType = data.questionsType;
+				}).catch(err => {
+					Toast('出现异常');
+				});
 
 
+			}
 
 
 		}

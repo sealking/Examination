@@ -1,118 +1,96 @@
 <template>
 	<div id="login">
-		<el-row class="title">
-			<el-col :span="18" :offset="3">{{title}}</el-col>
-		</el-row>
-		<el-row >
-			<el-col :span="18" :offset="3">
-				<el-form :model="info" :rules="rules" ref="info">
-					<el-form-item label="身份证号：" prop="userIdcard">
-						<el-input
-							autofocus 
-							v-model="info.userIdcard"
-							type="text" 
-							placeholder="请输入您的身份证号">
-						</el-input>
-					</el-form-item>
-				</el-form>
-				试题类型：
-				<el-radio-group v-model="info.questionType" >
-					<el-radio :key="'1'" :label="'1'">在线试题</el-radio>
-					<el-radio :key="'2'" :label="'2'">离线试题</el-radio>
-				</el-radio-group>
-				<el-button type="primary" round  @click="onSubmit('info')" center="true">立即登录</el-button>
-				<el-button type="primary" round  @click="offlineSyn()" center="true">离线同步</el-button>
-			</el-col>
-		</el-row>
+		<div id="logo">
+			<img src="../assets/img/logo.png">
+		</div>
+		<!-- 操作区域 -->
+        <div class="operateDiv">
+			<!-- 身份证号码 -->
+			<mt-field  v-model="userIdcard" placeholder="请输入身份证号码" class="myinput" ></mt-field>
+			<!-- 登录和切换登录方式块 -->
+			<div>
+				<mt-button size="large" type="primary" class="mybutton" @click="onlineLogin()">在线</mt-button>
+				<mt-button size="large"   class="mybutton" @click="offlineLogin()">离线</mt-button>
+			</div>
+        </div>
 	</div>
 </template>
 <script>
+	import { Toast } from 'mint-ui';
+
 	export default {
 		data() {
 			return {
+				// 标题
 				title: "安全生产在线模拟考试平台",
+				// 登录ControllerURL（在线）
 				loginUrl: "/login/userLogin",
 				offlineSynUrl: "examination/getQuestionsByType",
-				info: {
-					userIdcard: "",
-					questionType: '1'
-				},
-				rules: {
-					userIdcard: [
-						{ required: true, message: '请输入您的身份证号', trigger: 'blur' }
-					]
-				}
+				userIdcard: ""
 			}
 		},
 		methods: {
-			messageAlert(msg, type) {
-				if(type === 'success' || type === 'warning') {
-					this.$message({
-						message: msg,
-						type: type
-					});
-				} else if(type === 'error'){
-					this.$message.error(msg);
-				} else {
-					this.$message(msg);
+			onlineLogin() {
+				if(!this.userIdcard) {
+					Toast("请输入身份证号码");
+					return;
 				}
-				
-			},
-			MessageBoxAlert(title, msg) {
-				this.$alert(msg, title, {
-					confirmButtonText: '确定',
-				});
-			},
-			onSubmit(info) {
-				if(this.info.questionType === '1') {
-					this.$refs[info].validate((valid) => {
-						let options = {
-							userIdcard: this.info.userIdcard
-						};
-						if(valid) {
-							this.postAxios(this.loginUrl, options).then(data => {
-								if(data.returnCode === '0') {
-									this.messageAlert(data.msg, 'success');
-									// 学员编号
-									localStorage.setItem("studentNo",data.studentNo);
-									// 设置用户的身份证号
-									localStorage.setItem("userIdcard",this.info.userIdcard);
-									// 设置姓名
-									localStorage.setItem("userName",data.name);
-									// 设置所属单位
-									localStorage.setItem("userUnits",data.units);
-									// 设置试题类型（1：在线试题，2：离线试题）
-									localStorage.setItem("questionType",this.info.questionType);
-									// 跳转到登录确认页面
-									this.$emit('showLoginConfirmPage');
-								}else{
-									this.messageAlert(data.msg, 'error');
-								}
-							}).catch(err => {
-								this.messageAlert('出现异常', 'error');
-							});
-						}else {
-							return false;
-						}
-					});
-				} else {
-					this.$emit('showOfflinePage');
-				}
-			},
-			offlineSyn() {
-
-				this.postAxios(this.offlineSynUrl).then(data => {
-					localStorage.setItem("offlineQuestions",JSON.stringify(data));
+				let options = {
+					userIdcard: this.userIdcard
+				};
+				this.postAxios(this.loginUrl, options).then(data => {
+					if(data.returnCode === '0') {
+						Toast(data.msg);
+						// 学员编号
+						localStorage.setItem("studentNo",data.studentNo);
+						// 设置用户的身份证号
+						localStorage.setItem("userIdcard",this.userIdcard);
+						// 设置姓名
+						localStorage.setItem("userName",data.name);
+						// 设置所属单位
+						localStorage.setItem("userUnits",data.units);
+						// 跳转到登录确认页面
+						this.$emit('showIndexPage');
+					}else{
+						Toast(data.msg,);
+					}
 				}).catch(err => {
-					this.messageAlert('出现异常', 'error');
+					Toast('出现异常');
 				});
+			},
+			offlineLogin() {
+				this.$emit('showOfflinePage');
 			}
 		}
 	}
 </script>
-<style lang="less">
-	@import '../assets/css/public.css';
-	#login {
-		margin-top: 10px;
+<style scoped>
+    /* 操作区域的样式*/
+    .operateDiv {
+      padding-left: 20px;
+      padding-right: 20px;
+    }
+    .mybutton {
+      margin-top: 20px;
+    }
+    .myinput {
+      margin-top: 30px;
+      border:1px solid rgb(234,234,234);
+      border-radius:5px;
+      min-height:41px;
+
+    }
+    .imgDiv {
+      display: flex;
+      justify-content: center;
+    }
+
+	#logo {
+		font-family: 'Avenir', Helvetica, Arial, sans-serif;
+		-webkit-font-smoothing: antialiased;
+		-moz-osx-font-smoothing: grayscale;
+		text-align: center;
+		color: #2c3e50;
+		margin-top: 60px;
 	}
 </style>
