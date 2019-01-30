@@ -1,84 +1,115 @@
 <template>
-	<div v-loading="loading" element-loading-text="正在出题中...">
-		<el-row class="title">
-			<input type="hidden" v-model="hiddenData" >
-			<el-col :span="18" :offset="3">
-				总计:{{totalNumber}}&nbsp;已答:{{answerNumber}}&nbsp;正确:{{rightNumber}}&nbsp;错误:{{answerNumber - rightNumber}}
-			</el-col>
-		</el-row>
-		<el-row class="title">
-			<el-col :span="18" :offset="3" >
-				剩余时间：{{minute2}}分钟{{seconds2}}秒
-			</el-col>
-		</el-row>
-		<div class="exam-question">
-			<el-row>
-				<el-col :span="18" :offset="3" v-if="item.questionType === '1'">
-					<div class="question">单选题</div>
-					<div class="question">{{item.questionContent}}</div>
-					<div v-for="itemInfo in item.itemInfoList" :key="itemInfo" class="question">{{itemInfo}}</div>
-
-					<el-radio-group v-model="item.choice" :disabled="item.finish" @change="getResult()">
-						<el-radio v-for="itemIndexInfo in item.itemList" :key="itemIndexInfo" :label="itemIndexInfo">
-							{{itemIndexInfo}}
-						</el-radio>
-					</el-radio-group>
-				</el-col>
-				<el-col :span="18" :offset="3" v-if="item.questionType === '2'">
-					<div class="question">多选题</div>
-					<div class="question">{{item.questionContent}}</div>
-					<div v-for="itemInfo in item.itemInfoList" :key="itemInfo" class="question">{{itemInfo}}</div>
+	<div v-loading="loading">
+		<!-- 头部 -->
+		<div id="tab-bar">
+    		<mt-header title="模拟考试" fixed style="font-size:18px">
+      			<mt-button slot="right" @click="submitClick()">交卷</mt-button>
+    		</mt-header>
+  		</div>
+		<!-- 题目部 -->
+		<div class="content-div">
+			<div class="answer-result">
+				<div class="success-count">
+					<span class="mint-field-state is-success">
+						<i class="mintui mintui-field-success result-icon"></i>
+						<span class="result-count">{{rightNumber}}</span>
+					</span>
+				</div>
+				<div class="error-count">
+					<span class="mint-field-state is-error">
+						<i class="mintui mintui-field-error result-icon"></i>
+						<span class="result-count">{{answerNumber - rightNumber}}</span>
+					</span>
+				</div>
+				<div class="timer">
+					<mt-badge size="normal" type="error">{{minute2}}分{{seconds2}}秒</mt-badge>
+				</div>
+				<div class="all-count" >
+					<span class="mint-field-state">
+						<mt-badge size="normal" type="primary">答题进度</mt-badge>
+						<span class="result-count">{{answerNumber}}/{{totalNumber}}</span>
+					</span>
+				</div>
+			</div>
+			<div class="question-info">
+				<!-- 单选题 -->
+				<div v-if="item.questionType === '1'">
+					<div class="que-type">
+						<mt-badge size="normal" type="success">单选题</mt-badge>
+					</div>
+					<div class="que-decription">
+						<span>{{item.questionContent}}</span>                    
+					</div>
+					<div class="que-chose">
+						<mt-radio v-model="item.choice" :options="item.itemInfoList" :disabled="item.finish" ></mt-radio>
+					</div>
 					
-					<el-checkbox-group v-model="item.checkboxInfo" :disabled="item.finish" @change="refreshData()">
-						<el-checkbox v-for="itemIndexInfo in item.itemList" :key="itemIndexInfo" :label="itemIndexInfo">
-							{{itemIndexInfo}}
-						</el-checkbox>
-					</el-checkbox-group>
-				</el-col>
-				<el-col :span="18" :offset="3" v-if="item.questionType === '3'">
-					<div class="question">判断题</div>
-					<div class="question">{{item.questionContent}}</div>
+				</div>
+				<!-- 多选题 -->
+				<div v-if="item.questionType === '2'">
+					<div class="que-type">
+						<mt-badge size="normal" type="success">多选题</mt-badge>
+					</div>
+					<div class="que-decription">
+						<span>{{item.questionContent}}</span>                    
+					</div>
+					<div class="que-chose">
+						<mt-checklist v-model="item.checkboxInfo" :options="item.itemInfoList"></mt-checklist>
+					</div>
 					
-					<el-radio-group v-model="item.choice" :disabled="item.finish" @change="getResult()">
-						<el-radio :key="'A'" :label="'A'">正确</el-radio>
-						<el-radio :key="'B'" :label="'B'">错误</el-radio>
-					</el-radio-group>
-				</el-col>
-				<el-col :span="18" :offset="3" v-if="item.questionType === '4'">
-					<div class="question">填空题</div>
-					<div class="question">{{item.questionContent}}</div>
-					
-					<el-input v-model="item.choice" :disabled="item.finish" placeholder="请输入内容"></el-input>
-				</el-col>
-			</el-row>
-			<el-row class="answer" v-if="item.questionType === '2' || item.questionType === '4'">
-				<el-col :span="18" :offset="3">
-					<el-button class="submit-btn" @click="getResult()" :disabled="item.finish">确认</el-button>
-				</el-col>
-			</el-row>
-			<el-row class="answer" v-if="item.finish">
-				<el-col :span="18" :offset="3" v-if="item.questionType === '1' || item.questionType === '4'">
-					<div class="right" v-if="item.answer === item.choice">回答正确</div>
-					<div class="false" v-if="item.answer !== item.choice">回答错误<span v-if="examinationType === '2'">，正确答案为【{{item.answer}}】</span></div>
-				</el-col>
+				</div>
+				<!-- 判断题 -->
+				<div v-if="item.questionType === '3'">
+					<div class="que-type">
+						<mt-badge size="normal" type="success">判断题</mt-badge>
+					</div>
+					<div class="que-decription">
+						<span>{{item.questionContent}}</span>                    
+					</div>
+					<div class="que-chose">
+						<mt-radio v-model="item.choice" :options="item.itemInfoList"></mt-radio>
+					</div>
+				</div>
+				<!-- 填空题 -->
+				<div v-if="item.questionType === '4'">
+					<div class="que-type">
+						<mt-badge size="normal" type="success">填空题</mt-badge>
+					</div>
+					<div class="que-decription">
+						<span>{{item.questionContent}}</span>
+						<mt-field label="" placeholder="请输入正确答案" v-model="item.choice" :disabled="item.finish" ></mt-field>
+					</div>
+				</div>
+			</div>
+			<div class="btn-list">
+				<mt-button type="primary" size="small" @click="getResult()" :disabled="item.finish">确认</mt-button>
+			</div>
+			<div class="answer" v-if="item.finish">
+				<p class="answer-true" v-if="item.questionType === '1' || item.questionType === '4'">
+					<span v-if="item.answer === item.choice">回答正确</span>
+					<span v-if="item.answer !== item.choice">回答错误<span v-if="examinationType === '2'">，正确答案为【{{item.answer}}】</span></span>
+				</p>
+				<p class="answer-true" v-if="item.questionType === '2'">
+					<span v-if="item.answer === item.checkboxInfo.sort().join(',')">回答正确</span>
+					<span v-if="item.answer !== item.checkboxInfo.sort().join(',')">回答错误<span v-if="examinationType === '2'">，正确答案为【{{item.answer}}】</span></span>
+				</p>
+				<p class="answer-true" v-if="item.questionType === '3'">
+					<span v-if="item.answer === item.choice">回答正确</span>
+					<span v-if="item.answer !== item.choice">回答错误</span>
+				</p>
+			</div>
+		</div>
 
-				<el-col :span="18" :offset="3" v-if="item.questionType === '2' ">
-					<div class="right" v-if="item.answer === item.checkboxInfo.sort().join(',')">回答正确</div>
-					<div class="false" v-if="item.answer !== item.checkboxInfo.sort().join(',')">回答错误<span v-if="examinationType === '2'">，正确答案为【{{item.answer}}】</span></div>
-				</el-col>
-
-				<el-col :span="18" :offset="3" v-if="item.questionType === '3' ">
-					<div class="right" v-if="item.answer === item.choice">回答正确</div>
-					<div class="false" v-if="item.answer !== item.choice">回答错误</div>
-				</el-col>
-			</el-row>
-			<el-row class="answer">
-				<el-col :span="18" :offset="3">
-					<el-button  type="primary" @click="upBtnClick()" :disabled="upBtnFlg">上一题</el-button>
-					<el-button  type="primary" @click="downBtnClick()" :disabled="downBtnFlg">下一题</el-button>
-					<el-button  type="primary" @click="submitClick()">提交</el-button>
-				</el-col>
-			</el-row>
+		<!-- 底部 -->
+		<div id="tab-bar">
+			<mt-tabbar  fixed >
+			<div class="prev">
+				<mt-button  slot="left" @click="upBtnClick()" :disabled="upBtnFlg">上一题</mt-button>
+			</div>
+			<div class="next">
+				<mt-button type="primary" slot="right" @click="downBtnClick()" :disabled="downBtnFlg">下一题</mt-button>
+			</div>
+			</mt-tabbar>
 		</div>
 	</div>
 </template>
@@ -90,7 +121,6 @@
 	export default {
 		data() {
 			return {
-				hiddenData: 0,
 				minute: 0,
 				seconds: 0,
 				timer: null,
@@ -140,13 +170,16 @@
 					}
 					this.answerNumber++;
 				}
-
+				if(this.item.questionType === '1' || this.item.questionType === '2' || this.item.questionType === '3') {
+					this.item.itemInfoList.forEach(itemInfoTemp => {
+						itemInfoTemp.disabled =true;
+					})
+				}
 				this.item.finish = true;
 				this.item.answerFlg = true;
 				
 				this.upBtnFlg = upBtnFlgTemp;
 				this.downBtnFlg = downBtnFlgTemp;
-
 			},
 
 			// 点击上一题按钮
@@ -226,31 +259,37 @@
 					})
 					.then(action => {
  						if (action == 'confirm') { //确认的回调
- 							if(this.examinationType === '1') {
-								let option = {
-									stuNo: localStorage.getItem("studentNo"),
-									examNo: localStorage.getItem("examinationNo"),
-									score: this.score
-								}
-								// 提交分数
-								this.postAxios(this.updateScoreUrl,option).then(data => {
-									localStorage.setItem("score", this.score);
-									this.$router.push('scoreConfirm');
-								}).catch(err => {
-									Toast('出现异常');
-								});
-							} else {
-								localStorage.setItem("score", this.score);
-								this.$router.push('scoreConfirm');
-							}
+ 							this.postScore();
 						}
  					}).catch(err => { 
 						Toast('出现异常');
  					});
+				} else {
+					this.postScore();
 				}
 			},
-			refreshData() {
-				this.hiddenData++;
+			postScore() {
+				if(this.examinationType === '1') {
+					let option = {
+					stuNo: localStorage.getItem("studentNo"),
+					examNo: localStorage.getItem("examinationNo"),
+					score: this.score
+					}
+					// 提交分数
+					this.postAxios(this.updateScoreUrl,option).then(data => {
+						localStorage.setItem("score", this.score);
+						localStorage.setItem("answerNumber", this.answerNumber);
+						localStorage.setItem("totalNumber", this.totalNumber);
+						this.$router.push('scoreConfirm');
+					}).catch(err => {
+						Toast('出现异常');
+					});
+				} else {
+					localStorage.setItem("score", this.score);
+					localStorage.setItem("answerNumber", this.answerNumber);
+					localStorage.setItem("totalNumber", this.totalNumber);
+					this.$router.push('scoreConfirm');
+				}
 			}
 		},
 		computed: {
@@ -307,33 +346,106 @@
 		}	
 	}
 </script>
-<style lang="less">
-	@import '../assets/css/public.css';
-	.exam-question {
-		user-select:none;
-		margin-top: 35px;
-		font-size: 16px;
-		.option:first-child {
-			left: 0;
-		}
-		.question {
-			width:100%;
-			margin-bottom: 10px;
-			white-space:normal;
-		}
-		.answer {
-			margin-top: 10px;
-			font-size: 14px;
-			.right {
-				color: #67C23A;
-			}
-			.false {
-				color: #FA5555;
-			}
-		}
-		.submit-btn {
-			height: 30px;
-			line-height: 2px;
-		}
-	}
+<style scoped>
+  .foot-btn{
+    height:25px;
+    line-height:20px;
+    
+  }
+  .next{
+    
+  }
+  .prev, .next{
+    width:50%;
+  }
+  .prev button,.next button{
+    width:100%
+  }
+
+  .content-div {
+        margin: 40px 0px 0px 5px
+    }
+    .result-icon {
+        float:left;
+        padding: 5px;
+    }
+    .success-count, .error-count{
+        float:left;
+        width:15%;
+    }
+    .timer{
+        float:left;
+        width:30%;
+        text-align:center;
+        margin-top:5px
+    }
+    .all-count {
+        float:right;
+        margin-top:1px
+    }
+    .result-count{
+        line-height:32px
+    }
+    .answer-result .mint-field-state{
+        margin-left:0px;
+    }
+    .answer-result{
+        height:35px
+    }
+    .question-info{
+        margin-left:5px
+    }
+    .answer{
+        margin-left:15px;
+        margin-top: 10px;
+    }
+    .que-decription, .answer-explain{
+        margin-left:15px;
+        margin-top: 10px;
+        --min-height: 100px;
+        color: #6f6658;
+        font-weight: normal;
+    }
+    .que-chose{
+        color: #6f6658;
+        font-weight: normal;
+        margin-left:15px;
+    }
+    .que-chose div{
+        margin:5px;
+        box-sizing: border-box;
+    }
+    .check-chose-list, .radio-chose-list{
+        color: #6f6658;
+        padding:10px
+    }
+    .check-chose-list .mint-checklist-label, .radio-chose-list .mint-radiolist-label{
+        display:inline;
+    }
+    .que-type span{
+        font-weight: bold;
+    }
+    .btn-list {
+        margin-top: 15px; 
+        text-align:center;
+    }
+    .btn-list .mt-button{
+        width:50%
+    }
+    .answer-true{
+        font-weight: bold;
+    }
+    .que-list {
+        padding:5px
+    }
+    .modal-popup {
+        border-radius:5px;
+    }
+    .modal-popup .modal-div{
+        margin:5px,10px
+    }
+    .exam-type{
+        margin-bottom:10px;
+        margin-top:5px;
+    }
 </style>

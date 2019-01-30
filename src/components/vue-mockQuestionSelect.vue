@@ -1,21 +1,23 @@
 <template>
-	<div>
-		<el-row>
-			<el-col :span="18" :offset="3">
-			<el-table ref="mockExamTable" :data="mockExamTableData" highlight-current-row @current-change="handleCurrentChange" style="width: 100%">
-				<el-table-column property="questionsNo" label="题库编号"></el-table-column>
-				<el-table-column property="settingDate" label="日期" width="160"></el-table-column>
-				<el-table-column v-if="false" property="studentNo" label="学员编号"></el-table-column>
-			</el-table>
-			</el-col>
-		</el-row>
-		<el-row>
-			<el-col :span="18" :offset="3">
-				<el-button  type="primary" @click="randomOnClick()" >随机生成试题</el-button>
-				<el-button  type="primary" @click="selectOnClick()" >选择试题</el-button>
-			</el-col>
-		</el-row>
-	</div>
+	<div id="exam_history" class="operateDiv">
+    <div class="box">
+      <mt-header fixed title="题库列表" style="font-size:18px"></mt-header>
+    </div>
+    <div class="history-wrapper" id="history">
+		<div><mt-cell style="text-align:left" title="题库编号" class="history-listitem"><span style="text-align:right">日期</span></mt-cell></div>
+      <div v-for="item in mockExamTableData" v-bind:key="item.settingDate" @click="selectOnClick(item)" >
+		  
+        <mt-cell
+          style="text-align:left"
+          v-bind:title="item.questionsNo"
+          class="history-listitem"
+        >{{item.settingDate}}</mt-cell>
+      </div>
+    </div>
+    <div class="footBox">
+      <mt-button size="large" type="primary" class="mybutton" @click="randomOnClick()">随机生成试题</mt-button>
+    </div>
+  </div>
 </template>
 <script>
 	import { Toast } from 'mint-ui';
@@ -31,9 +33,6 @@
 			}
 		},
 		methods: {
-			handleCurrentChange(val) {
-				this.currentRow = val;
-			},
 			randomOnClick() {
 				let parms = {
 					examinationType: "2",
@@ -56,37 +55,26 @@
 					Toast('出现异常');
 				});
 			},
-			selectOnClick() {
+			selectOnClick(item) {
+				let parms = {
+					studentNo: item.studentNo,
+					questionsNo: item.questionsNo,
+					settingDate: item.settingDate
+				};
 
-				if(this.currentRow === null) {
-					Toast('请选择相应的试题');
-				} else {
-					let parms = {
-						studentNo: this.currentRow.studentNo,
-						questionsNo: this.currentRow.questionsNo,
-						settingDate: this.currentRow.settingDate
-					};
-
-					this.postAxios(this.getQuestionsByDateUrl, parms).then(data => {
-						if(data.returnCode === '0') {
-							// 试题信息
-							localStorage.setItem("questionInfoList",JSON.stringify(data.questionInfoList));
-							// 考试分钟数
-							localStorage.setItem("examinationMinute",data.examinationMinute);
-							this.$router.replace('examIndex');
-						} else {
-							Toast(data.msg);
-						}
-					}).catch(err => {
-						Toast('出现异常');
-					});
-
-
-
-				}
-
-
-
+				this.postAxios(this.getQuestionsByDateUrl, parms).then(data => {
+					if(data.returnCode === '0') {
+						// 试题信息
+						localStorage.setItem("questionInfoList",JSON.stringify(data.questionInfoList));
+						// 考试分钟数
+						localStorage.setItem("examinationMinute",data.examinationMinute);
+						this.$router.replace('examIndex');
+					} else {
+						Toast(data.msg);
+					}
+				}).catch(err => {
+					Toast('出现异常');
+				});
 			}
 		},
 		mounted() {
@@ -102,4 +90,43 @@
 				});
 		}
 	}
+	
 </script>
+<style scoped>
+/* 操作区域的样式*/
+.mybutton {
+  margin-top: 20px;
+}
+
+.history-wrapper {
+  height: 85vh;
+  overflow: scroll;
+}
+
+.history-list {
+  list-style: none;
+}
+
+.history-listitem {
+  height: 50px;
+  line-height: 50px;
+  border-radius: 2px;
+  border-bottom: solid 1px rgb(234, 234, 234);
+}
+
+.box {
+  display: -webkit-flex; /*在webkit内核的浏览器上使用要加前缀*/
+  display: flex;
+  flex-direction: column;
+  border-bottom: solid 1px rgb(234, 234, 234);
+  padding-bottom: 30px;
+}
+
+.footBox {
+  margin-bottom: 1px;
+  position: absolute;
+  bottom: 0;
+  left: 0px;
+  width: 100%;
+}
+</style>

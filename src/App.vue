@@ -5,11 +5,12 @@
 </template>
 
 <script>
-	import vueLogin from './components/vue-login.vue';
+	import { Toast } from 'mint-ui';
 
 	export default {
 		name: "App",
 		mounted() {
+
 			let studentNo = localStorage.getItem("studentNo");
 
 			if(studentNo) {
@@ -17,7 +18,6 @@
 			} else {
 				this.$router.push('/login');
 			}
-			
 		}
 		
 	}
