@@ -1,7 +1,7 @@
 <template>
 	<div id="login">
 		<div id="logo">
-			<img src="../assets/img/logo.png">
+			<img style="width:60vw" src="../assets/img/logo.png">
 		</div>
 		<!-- 操作区域 -->
         <div class="operateDiv">
@@ -9,8 +9,8 @@
 			<mt-field  v-model="userIdcard" placeholder="请输入身份证号码" class="myinput" ></mt-field>
 			<!-- 登录和切换登录方式块 -->
 			<div>
-				<mt-button size="large" type="primary" class="mybutton" @click="onlineLogin()">在线</mt-button>
-				<mt-button size="large"   class="mybutton" @click="offlineLogin()">离线</mt-button>
+				<mt-button size="large" type="primary" class="mybutton" @click="onlineLogin()">登录</mt-button>
+				<!-- <mt-button size="large"   class="mybutton" @click="offlineLogin()">离线</mt-button> -->
 			</div>
         </div>
 	</div>
@@ -21,11 +21,9 @@
 	export default {
 		data() {
 			return {
-				// 标题
-				title: "安全生产在线模拟考试平台",
 				// 登录ControllerURL（在线）
 				loginUrl: "/login/userLogin",
-				offlineSynUrl: "examination/getQuestionsByType",
+				// 身份证号
 				userIdcard: ""
 			}
 		},

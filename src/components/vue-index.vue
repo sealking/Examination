@@ -3,7 +3,7 @@
     <div class="top">
       <div class="top-blank"></div>
       <div class="top-mid">
-        <span class="title-font">安全培训考核管理系统</span>
+        <span class="title-font">安全生产在线模拟考试平台</span>
       </div>
       <div class="top-left">
         <span class="name-font">{{userName}}</span>
@@ -254,7 +254,7 @@
 .title-font {
   font-style:normal;
   font-weight:bold;
-  font-size: 5.5vw;
+  font-size: 5vw;
   font-family:微软雅黑;
   color:#FFFFFF;
 }

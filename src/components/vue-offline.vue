@@ -3,6 +3,7 @@
 		<!-- 头部 -->
 		<div id="tab-bar">
     		<mt-header title="离线学习" fixed style="font-size:18px">
+				<mt-button v-if="questiones.length !== 0" slot="right" @click="showModal()">…</mt-button>
     		</mt-header>
   		</div>
 		<!-- 题目部 -->
@@ -16,7 +17,7 @@
                     </mt-cell>
                 </div>
 				<div class="all-count" v-if="questiones.length !== 0">
-					<span class="mint-field-state" @click="showModal">
+					<span class="mint-field-state">
 						<mt-badge size="normal" type="primary">答题进度</mt-badge>
 						<span class="result-count">{{answerNumber}}/{{totalNumber}}</span>
 					</span>
@@ -42,7 +43,7 @@
 						<mt-badge size="normal" type="success">单选题</mt-badge>
 					</div>
 					<div class="que-decription">
-						<span>{{item.questionContent}}</span>
+						<span>{{index + 1}}、{{item.questionContent}}</span>
 					</div>
 					<div class="que-chose">
 						<mt-radio v-model="item.choice" :options="item.itemInfoList" :disabled="item.finish" ></mt-radio>
@@ -55,7 +56,7 @@
 						<mt-badge size="normal" type="success">多选题</mt-badge>
 					</div>
 					<div class="que-decription">
-						<span>{{item.questionContent}}</span>                    
+						<span>{{index + 1}}、{{item.questionContent}}</span>                    
 					</div>
 					<div class="que-chose">
 						<mt-checklist v-model="item.checkboxInfo" :options="item.itemInfoList"></mt-checklist>
@@ -68,7 +69,7 @@
 						<mt-badge size="normal" type="success">判断题</mt-badge>
 					</div>
 					<div class="que-decription">
-						<span>{{item.questionContent}}</span>                    
+						<span>{{index + 1}}、{{item.questionContent}}</span>                    
 					</div>
 					<div class="que-chose">
 						<mt-radio v-model="item.choice" :options="item.itemInfoList"></mt-radio>
@@ -80,7 +81,7 @@
 						<mt-badge size="normal" type="success">填空题</mt-badge>
 					</div>
 					<div class="que-decription">
-						<span>{{item.questionContent}}</span>
+						<span>{{index + 1}}、{{item.questionContent}}</span>
 						<mt-field label="" placeholder="请输入正确答案" v-model="item.choice" :disabled="item.finish" ></mt-field>
 					</div>
 				</div>
@@ -125,23 +126,35 @@
 	export default {
 		data() {
 			return {
+				// 用于刷新页面
 				hiddenData: 0,
+				// 总题数
 				totalNumber: 0,
+				// 已回答题数
 				answerNumber: 0,
 				// 题目类别Options
 				questionsTypeOptions: [],
+				// 题号popup显示Flag
 				popupVisible: false,
+				// 题目类别Key
 				optionKey: "",
+				// 题目类别Value
 				optionValue: "",
+				// 试题信息
 				questiones: [],
+				// 每道题的对象
 				item: "",
+				// 试题索引
 				index:0,
+				// 上一页是否显示Flag
 				upBtnFlg: true,
+				// 下一页是否显示Flag
 				downBtnFlg: true,
-				currentTags: {},
+				// 题目类别popup显示Flag
 				pullDownVisible: false,
-				examinationType : localStorage.getItem("examinationType"),
+				// 获取题目类型
 				getDataTypeInfoUrl: "/common/getDataTypeInfo",
+				// 试题题库
 				allquestions: []
 			}
 		},
@@ -265,7 +278,7 @@
 					if(this.allquestions) {
 						if(this.allquestions.length > 0) {
 							for(var i = 0; i < this.allquestions.length; i++) {
-								if(this.optionKey === this.allquestions[i].questionType) {
+								if(this.optionKey === this.allquestions[i].questionTypeKey) {
 									this.questiones = this.allquestions[i].questionInfoList;
 									break;
 								}
@@ -306,49 +319,42 @@
         }
 		},
 		mounted() {
-			// 获取题目类别
-			this.postAxios(this.getDataTypeInfoUrl, {typeCode: 'tmzl'}).then(data => {
-			let valuesObj = new Object();
-			let valuesList = [{ key: '0', value: "请选择" }];
-
-			data.dataTypeList.forEach(itemInfo => {
-				let valuesItem = new Object();
-				valuesItem.key = itemInfo.key;
-				valuesItem.value = itemInfo.value;
-				valuesList.push(valuesItem);
-			});
-			valuesObj.values = valuesList;
-			this.questionsTypeOptions.push(valuesObj);
-			}).catch(err => {
-				Toast('出现异常');
-			});
+			
+			this.allquestions = JSON.parse(localStorage.getItem("offlineQuestions"));
 			this.optionKey = '0';
 			this.optionValue = '请选择';
 
-			this.allquestions = JSON.parse(localStorage.getItem("offlineQuestions"));
+			// 获取题目类别
+			let valuesObj = new Object();
+			let valuesList = [{ key: '0', value: "请选择" }];
 
-
+			if(this.allquestions) {
+				this.allquestions.forEach(itemInfo => {
+					let valuesItem = new Object();
+					valuesItem.key = itemInfo.questionTypeKey;
+					valuesItem.value = itemInfo.questionTypeValue;
+					valuesList.push(valuesItem);
+				});
+			}
+			valuesObj.values = valuesList;
+			this.questionsTypeOptions.push(valuesObj);
 		}
 	}
 </script>
 <style scoped>
-  .foot-btn{
-    height:25px;
-    line-height:20px;
-    
-  }
-  .next{
-    
-  }
-  .prev, .next{
-    width:50%;
-  }
-  .prev button,.next button{
-    width:100%
-  }
+	.foot-btn{
+		height:25px;
+    	line-height:20px;
+  	}
+  	.prev, .next{
+    	width:50%;
+  	}
+  	.prev button,.next button{
+   		width:100%
+  	}
 
-  .content-div {
-        margin: 40px 0px 0px 5px
+	.content-div {
+		margin: 40px 0px 0px 5px
     }
     .result-icon {
         float:left;
@@ -402,7 +408,7 @@
     }
     .check-chose-list, .radio-chose-list{
         color: #6f6658;
-        padding:10px
+        padding:10px；
     }
     .check-chose-list .mint-checklist-label, .radio-chose-list .mint-radiolist-label{
         display:inline;
@@ -415,7 +421,7 @@
         text-align:center;
     }
     .btn-list .mt-button{
-        width:50%
+        width:50%；
     }
     .answer-true{
         font-weight: bold;
@@ -425,15 +431,16 @@
 		width:9%;
 		text-align:center;
 		padding:5px;
+		margin:3px;
 		border:1px solid #8E959F;
 		color:#363D45;
-		font-size:80%
+		font-size:80%；
     }
     .modal-popup {
         border-radius:5px;
     }
     .modal-popup .modal-div{
-        margin:5px,10px
+        margin:5px,10px；
     }
     .exam-type{
         margin-bottom:10px;

@@ -1,5 +1,8 @@
 <template>
 	<div id="simulated_exam" class="operateDiv">
+		<div class="box">
+			<mt-header fixed title="题库列表" style="font-size:18px"></mt-header>
+		</div>
 		<mt-cell style="text-align:left" title="培训类别" is-link @click.native="handleClickTrainingType">
 			<span style="color: green">{{trainingType}}</span>
 		</mt-cell>
@@ -23,8 +26,8 @@
 		<mt-popup v-model="workTypeVisible" position="bottom" style="width:100vw">
 		<mt-picker :slots="workTypeOptions" @change="onProfessionValuesChange" valueKey="value"></mt-picker>
 		</mt-popup>
-    	<div>
-			题库种类：{{questionsType}}
+		<div style="text-align: left;padding-left: 10px;padding-right: 20px;">题库种类：{{questionsType}}</div>
+    	<div class="footBox">
 			<mt-button v-if="examinationType === '1'" size="large" type="primary" class="mybutton" @click="onlineOnClick()">在线考试</mt-button>
             <mt-button v-if="examinationType === '2'" size="large" type="primary" class="mybutton" @click="mockOnClick()">模拟考试</mt-button>
         </div>
@@ -57,41 +60,24 @@
 				workTypeKey: "",
 				// 题库种类
 				questionsType: "",
+				// 获取字典信息URL
 				getDataTypeInfoUrl: "/common/getDataTypeInfo",
+				// 获取题库种类URL
 				getQuestionsTypeUrl: "/examination/getQuestionsType",
-				updateExamFlagUrl: "/examination/updateIsExamFlag",
+				// 更新分数URL
 				updateScoreUrl: "/examination/updateScore",
+				// 根据code获取数据字典信息
 				getTypeInfoByDetailCodeUrl: "common/getDataTypeInfoByDetailCode",
+				// 培训类别popup显示Flag
 				trainingTypeVisible: false,
+				// 培训层次popup显示Flag
 				trainingLevelVisible: false,
+				// 工种popup显示Flag
 				workTypeVisible: false,
 			}
 		},
 		methods: {
-			workTypeOnchange() {
-				// 获取题库种类
-				this.postAxios(this.getQuestionsTypeUrl, {workTypeCode: this.workType}).then(data => {
-					this.questionsType = data.questionsType;
-				}).catch(err => {
-					Toast('出现异常');
-				});
-			},
 			onlineOnClick() {
-				// 更新成绩表中的是否考试Flg
-				let option = {
-					stuNo: localStorage.getItem("studentNo"),
-					examNo: localStorage.getItem("examinationNo"),
-					score: 0
-				}
-				this.postAxios(this.updateExamFlagUrl, option).then(data => {
-				}).catch(err => {
-					Toast('出现异常');
-				});
-				// 初始化成绩表中的成绩
-				this.postAxios(this.updateScoreUrl, option).then(data => {
-				}).catch(err => {
-					Toast('出现异常');
-				});
 				this.$router.push('/examIndex');
 			},
 			mockOnClick() {
@@ -147,6 +133,12 @@
 					this.workTypeKey = picker.getValues()[0].key;
 					this.workType = picker.getValues()[0].value;
 					this.workTypeVisible = false;
+					// 获取题库种类
+					this.postAxios(this.getQuestionsTypeUrl, {workTypeCode: this.workTypeKey}).then(data => {
+						this.questionsType = data.questionsType;
+					}).catch(err => {
+						Toast('出现异常');
+					});
 				} else {
 					this.workType = "";
 				}
@@ -239,11 +231,28 @@
 <style scoped>
     /* 操作区域的样式*/
     .operateDiv {
-      padding-left: 20px;
-      padding-right: 20px;
-      text-align: center;
+		padding-left: 20px;
+		padding-right: 20px;
+		text-align: center;
     }
     .mybutton {
-      margin-top: 20px;
-    }
+        margin-top: 20px;
+		display: inline-block;
+		width: 90%;
+	}
+	.footBox {
+		margin-bottom: 0px;
+		position: absolute;
+		bottom: 1px;
+		left: 0px;
+		width: 100%;
+		text-align: center;
+	}
+	.box {
+		display: -webkit-flex; /*在webkit内核的浏览器上使用要加前缀*/
+		display: flex;
+		flex-direction: column;
+		border-bottom: solid 1px rgb(234, 234, 234);
+		padding-bottom: 30px;
+	}
 </style>

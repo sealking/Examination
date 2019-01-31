@@ -24,10 +24,13 @@
 	export default {
 		data() {
 			return {
+				// 模拟考试历史列表
 				mockExamTableData: [],
-				currentRow: null,
+				// 获取模拟考试历史列表URL
 				getExamListUrl: "/examination/getExamListByStuNo",
+				// 随机获取模拟试题URL
 				getQuestionsUrl: "/examination/getQuestions",
+				// 根据日期获得模拟试题URL
 				getQuestionsByDateUrl: "/examination/getQuestionsByDate"
 
 			}
@@ -84,7 +87,6 @@
 			}
 			this.postAxios(this.getExamListUrl, parm).then(data => {
 					this.mockExamTableData = data;
-					console.log(this.mockExamTableData);
 				}).catch(err => {
 					Toast('出现异常');
 				});
@@ -94,39 +96,42 @@
 </script>
 <style scoped>
 /* 操作区域的样式*/
-.mybutton {
-  margin-top: 20px;
-}
+	.mybutton {
+		margin-top: 20px;
+			display: inline-block;
+			width: 90%;
+		}
 
-.history-wrapper {
-  height: 85vh;
-  overflow: scroll;
-}
+	.history-wrapper {
+		height: 85vh;
+		overflow: scroll;
+	}
 
-.history-list {
-  list-style: none;
-}
+	.history-list {
+		list-style: none;
+	}
 
-.history-listitem {
-  height: 50px;
-  line-height: 50px;
-  border-radius: 2px;
-  border-bottom: solid 1px rgb(234, 234, 234);
-}
+	.history-listitem {
+		height: 50px;
+		line-height: 50px;
+		border-radius: 2px;
+		border-bottom: solid 1px rgb(234, 234, 234);
+	}
 
-.box {
-  display: -webkit-flex; /*在webkit内核的浏览器上使用要加前缀*/
-  display: flex;
-  flex-direction: column;
-  border-bottom: solid 1px rgb(234, 234, 234);
-  padding-bottom: 30px;
-}
+	.box {
+		display: -webkit-flex; /*在webkit内核的浏览器上使用要加前缀*/
+		display: flex;
+		flex-direction: column;
+		border-bottom: solid 1px rgb(234, 234, 234);
+		padding-bottom: 30px;
+	}
 
-.footBox {
-  margin-bottom: 1px;
-  position: absolute;
-  bottom: 0;
-  left: 0px;
-  width: 100%;
-}
+	.footBox {
+			margin-bottom: 0px;
+			position: absolute;
+			bottom: 1px;
+			left: 0px;
+			width: 100%;
+			text-align: center;
+	}
 </style>

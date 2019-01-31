@@ -1,5 +1,5 @@
 <template>
-	<div v-loading="loading">
+	<div>
 		<!-- 头部 -->
 		<div id="tab-bar">
     		<mt-header title="模拟考试" fixed style="font-size:18px">
@@ -9,13 +9,13 @@
 		<!-- 题目部 -->
 		<div class="content-div">
 			<div class="answer-result">
-				<div class="success-count">
+				<div class="success-count" v-if="examinationType === '2'">
 					<span class="mint-field-state is-success">
 						<i class="mintui mintui-field-success result-icon"></i>
 						<span class="result-count">{{rightNumber}}</span>
 					</span>
 				</div>
-				<div class="error-count">
+				<div class="error-count" v-if="examinationType === '2'">
 					<span class="mint-field-state is-error">
 						<i class="mintui mintui-field-error result-icon"></i>
 						<span class="result-count">{{answerNumber - rightNumber}}</span>
@@ -85,15 +85,15 @@
 				<mt-button type="primary" size="small" @click="getResult()" :disabled="item.finish">确认</mt-button>
 			</div>
 			<div class="answer" v-if="item.finish">
-				<p class="answer-true" v-if="item.questionType === '1' || item.questionType === '4'">
+				<p class="answer-true" v-if="examinationType === '2' && (item.questionType === '1' || item.questionType === '4')">
 					<span v-if="item.answer === item.choice">回答正确</span>
-					<span v-if="item.answer !== item.choice">回答错误<span v-if="examinationType === '2'">，正确答案为【{{item.answer}}】</span></span>
+					<span v-if="item.answer !== item.choice">回答错误，正确答案为【{{item.answer}}】</span>
 				</p>
-				<p class="answer-true" v-if="item.questionType === '2'">
+				<p class="answer-true" v-if="examinationType === '2' && item.questionType === '2'">
 					<span v-if="item.answer === item.checkboxInfo.sort().join(',')">回答正确</span>
 					<span v-if="item.answer !== item.checkboxInfo.sort().join(',')">回答错误<span v-if="examinationType === '2'">，正确答案为【{{item.answer}}】</span></span>
 				</p>
-				<p class="answer-true" v-if="item.questionType === '3'">
+				<p class="answer-true" v-if="examinationType === '2' && item.questionType === '3'">
 					<span v-if="item.answer === item.choice">回答正确</span>
 					<span v-if="item.answer !== item.choice">回答错误</span>
 				</p>
@@ -121,21 +121,38 @@
 	export default {
 		data() {
 			return {
+				// 分钟数
 				minute: 0,
+				// 秒数
 				seconds: 0,
+				// 定时器
 				timer: null,
+				// 总题数
 				totalNumber: 0,
+				// 已回答天数
 				answerNumber: 0,
+				// 回答正确数
 				rightNumber: 0,
+				// 分数
 				score: 0,
-				loading: true,
+				// 试题数组
 				questiones: [],
+				// 每道题的对象
 				item: "",
+				// 试题索引
 				index:0,
+				// 上一页是否显示Flag
 				upBtnFlg: true,
+				// 下一页是否显示Flag
 				downBtnFlg: true,
+				// 考试类型（1：在线考试，2：模拟考试）
 				examinationType : localStorage.getItem("examinationType"),
-				updateScoreUrl: "/examination/updateScore"
+				// 更新分数URL
+				updateScoreUrl: "/examination/updateScore",
+				// 更新考试状态FlagURL
+				updateExamFlagUrl: "/examination/updateIsExamFlag",
+				// 获取在线考试试题
+				getQuestionsUrl: "/examination/getQuestions",
 			}
 		},
 		methods: {
@@ -270,17 +287,42 @@
 			},
 			postScore() {
 				if(this.examinationType === '1') {
-					let option = {
-					stuNo: localStorage.getItem("studentNo"),
-					examNo: localStorage.getItem("examinationNo"),
-					score: this.score
-					}
-					// 提交分数
-					this.postAxios(this.updateScoreUrl,option).then(data => {
-						localStorage.setItem("score", this.score);
-						localStorage.setItem("answerNumber", this.answerNumber);
-						localStorage.setItem("totalNumber", this.totalNumber);
-						this.$router.push('scoreConfirm');
+					// 查询是否已经考过试
+					let parms = {
+						examinationType: "1",
+						studentNo: localStorage.getItem("studentNo")
+					};
+					this.postAxios(this.getQuestionsUrl, parms).then(data => {
+						if(data.returnCode === '0') {
+							let isExamFlag = data.isExamFlag;
+							if('1' === isExamFlag) {
+								Toast("您已经参加过该考试");
+								return;
+							} else {
+								let option = {
+								stuNo: localStorage.getItem("studentNo"),
+								examNo: localStorage.getItem("examinationNo"),
+								score: this.score
+								}
+								// 更新成绩表中的是否考试Flg
+								this.postAxios(this.updateExamFlagUrl, option).then(data => {
+								}).catch(err => {
+									Toast('出现异常');
+								});
+								// 提交分数
+								this.postAxios(this.updateScoreUrl,option).then(data => {
+									localStorage.setItem("score", this.score);
+									localStorage.setItem("answerNumber", this.answerNumber);
+									localStorage.setItem("totalNumber", this.totalNumber);
+									this.$router.replace('scoreConfirm');
+								}).catch(err => {
+									Toast('出现异常');
+								});
+							}
+						}else {
+							Toast(data.msg);
+							return;
+						}
 					}).catch(err => {
 						Toast('出现异常');
 					});
@@ -312,7 +354,6 @@
 			this.questiones.forEach(itemTemp => {
       			itemTemp.checkboxInfo = [];
 			})
-			this.loading = false;
 			this.index = 0;
 			this.item = this.questiones[this.index];
 
@@ -350,9 +391,6 @@
   .foot-btn{
     height:25px;
     line-height:20px;
-    
-  }
-  .next{
     
   }
   .prev, .next{

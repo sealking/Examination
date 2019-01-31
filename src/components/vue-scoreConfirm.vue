@@ -37,34 +37,34 @@
 
 
 <style scoped>
-.operateDiv {
-  padding-left: 20px;
-  padding-right: 20px;
-  text-align: center;
-}
-.box {
-  display: -webkit-flex;
-  display: flex;
-  flex-direction: row;
-  margin-bottom: 20px;
-  font-size: 4vw;
-}
-.title {
-  margin-bottom: 100px;
-}
+  .operateDiv {
+    padding-left: 20px;
+    padding-right: 20px;
+    text-align: center;
+  }
+  .box {
+    display: -webkit-flex;
+    display: flex;
+    flex-direction: row;
+    margin-bottom: 20px;
+    font-size: 4vw;
+  }
+  .title {
+    margin-bottom: 100px;
+  }
 
-.mybutton {
-  margin-top: 20px;
-  display: inline-block;
-  width: 90%;
-}
+  .mybutton {
+    margin-top: 20px;
+    display: inline-block;
+    width: 90%;
+  }
 
-.footBox {
-  margin-bottom: 0px;
-  position: absolute;
-  bottom: 1px;
-  left: 0px;
-  width: 100%;
-  text-align: center;
-}
+  .footBox {
+    margin-bottom: 0px;
+    position: absolute;
+    bottom: 1px;
+    left: 0px;
+    width: 100%;
+    text-align: center;
+  }
 </style>
