@@ -46,16 +46,31 @@ function errorState (response) {
 
 // 封装axios--------------------------------------------------------------------------------------
 function apiAxios (method, url, params) {
-  let httpDefault = {
-    method: method,
-    baseURL: baseURL,
-    url: url,
-    // `params` 是即将与请求一起发送的 URL 参数
-    // `data` 是作为请求主体被发送的数据
-    params: method === 'GET' || method === 'DELETE' ? params : null,
-    data: method === 'POST' || method === 'PUT' ? qs.stringify(params) : null,
-    timeout: 10000
+  let httpDefault;
+  if(method === 'DOWNLOAD') {
+    httpDefault = {
+      method: 'GET',
+      baseURL: baseURL,
+      url: url,
+      // `params` 是即将与请求一起发送的 URL 参数
+      // `data` 是作为请求主体被发送的数据
+      params:  params,
+      responseType:'blob',
+      timeout: 10000
+    }
+  } else {
+    httpDefault = {
+      method: method,
+      baseURL: baseURL,
+      url: url,
+      // `params` 是即将与请求一起发送的 URL 参数
+      // `data` 是作为请求主体被发送的数据
+      params: method === 'GET' || method === 'DELETE' ? params : null,
+      data: method === 'POST' || method === 'PUT' ? qs.stringify(params) : null,
+      timeout: 10000
+    }
   }
+  
 
   // 注意**Promise**使用(Promise首字母大写)
   return new Promise((resolve, reject) => {
@@ -79,5 +94,6 @@ export default {
     Vue.prototype.postAxios = (url, params) => apiAxios('POST', url, params)
     Vue.prototype.putAxios = (url, params) => apiAxios('PUT', url, params)
     Vue.prototype.delectAxios = (url, params) => apiAxios('DELECT', url, params)
+    Vue.prototype.downloadAxios = (url, params) => apiAxios('DOWNLOAD', url, params)
   }
 }
