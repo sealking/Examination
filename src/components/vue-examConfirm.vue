@@ -1,18 +1,20 @@
 <template>
 	<div id="simulated_exam" class="operateDiv">
 		<div class="box">
-			<mt-header fixed title="题库列表" style="font-size:18px"></mt-header>
+			<mt-header fixed title="题库列表" style="font-size:16px">
+				<mt-button slot="left" style="font-size:14px" @click="$router.back(-1)">返回</mt-button>
+			</mt-header>
 		</div>
 		<mt-cell style="text-align:left" title="培训类别" is-link @click.native="handleClickTrainingType">
 			<span style="color: green">{{trainingType}}</span>
 		</mt-cell>
 
 		<mt-cell style="text-align:left" title="培训层次" is-link @click.native="handleClickTrainingLevel">
-		<span style="color: green">{{trainingLevel}}</span>
+			<span style="color: green">{{trainingLevel}}</span>
 		</mt-cell>
 
 		<mt-cell style="text-align:left" title="工种岗位" is-link @click.native="handleClickWorkType">
-		<span style="color: green">{{workType}}</span>
+			<span style="color: green">{{workType}}</span>
 		</mt-cell>
 
 		<mt-popup v-model="trainingTypeVisible" position="bottom" style="width:100vw">
@@ -28,9 +30,9 @@
 		</mt-popup>
 		<div style="text-align: left;padding-left: 10px;padding-right: 20px;">题库种类：{{questionsType}}</div>
     	<div class="footBox">
-			<mt-button v-if="examinationType === '1'" size="large" type="primary" class="mybutton" @click="onlineOnClick()">在线考试</mt-button>
-            <mt-button v-if="examinationType === '2'" size="large" type="primary" class="mybutton" @click="mockOnClick()">模拟考试</mt-button>
-        </div>
+				<mt-button v-if="examinationType === '1'" size="large" type="primary" class="mybutton" @click="onlineOnClick()">在线考试</mt-button>
+				<mt-button v-if="examinationType === '2'" size="large" type="primary" class="mybutton" @click="mockOnClick()">模拟考试</mt-button>
+      </div>
   </div>
 </template>
 <script>
@@ -78,12 +80,12 @@
 		},
 		methods: {
 			onlineOnClick() {
-				this.$router.push('/examIndex');
+				this.$router.replace('/examIndex');
 			},
 			mockOnClick() {
 				if(this.dataValid()) {
 					localStorage.setItem("workType",this.workTypeKey);
-					this.$router.push('mockQuestionSelect');
+					this.$router.replace('mockQuestionSelect');
 				}
 			},
 
@@ -236,10 +238,11 @@
 		text-align: center;
     }
     .mybutton {
-        margin-top: 20px;
-		display: inline-block;
-		width: 90%;
-	}
+			margin-top: 20px;
+			font-size: 16px;
+			display: inline-block;
+			width: 90%;
+		}
 	.footBox {
 		margin-bottom: 0px;
 		position: absolute;

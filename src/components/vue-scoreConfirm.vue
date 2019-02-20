@@ -1,7 +1,7 @@
 <template>
   <div id="score" class="operateDiv">
     <div class="title">
-      <mt-header fixed title="成绩信息" style="font-size:18px"></mt-header>
+      <mt-header fixed title="成绩信息" style="font-size:16px"></mt-header>
     </div>
     <div class="box">
       <div style="width:60%;text-align:left;">已答题数：&nbsp;&nbsp;&nbsp;&nbsp;{{answerNumber}}</div>
@@ -57,6 +57,8 @@
     margin-top: 20px;
     display: inline-block;
     width: 90%;
+    font-size: 16px;
+    
   }
 
   .footBox {

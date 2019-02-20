@@ -2,7 +2,10 @@
 	<div>
 		<!-- 头部 -->
 		<div id="tab-bar">
-    		<mt-header title="模拟考试" fixed style="font-size:18px">
+    		<mt-header v-if="examinationType === '1'" title="在线考试" fixed style="font-size:16px">
+      			<mt-button slot="right" @click="submitClick()">交卷</mt-button>
+    		</mt-header>
+			<mt-header v-if="examinationType === '2'" title="模拟考试" fixed style="font-size:16px">
       			<mt-button slot="right" @click="submitClick()">交卷</mt-button>
     		</mt-header>
   		</div>
@@ -419,7 +422,8 @@
     }
     .all-count {
         float:right;
-        margin-top:1px
+        margin-top:1px;
+		margin-right:5px;
     }
     .result-count{
         line-height:32px

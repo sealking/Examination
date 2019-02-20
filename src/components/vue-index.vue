@@ -13,7 +13,12 @@
       </div>
       <div class="top-blank"></div>
     </div>
-    <div><img class="banner-image" src="../assets/img/banner.png" ></div>
+  	<!-- <div><img class="banner-image" src="../assets/img/banner.png" ></div> -->
+		<div class="banner">
+      <div class="banner-text">
+        <span class="banner-font">关注安全 关注生命</span>
+      </div>
+    </div>
     <div class="div-menu-blank"></div>
     <div class="div-menu">
       <div class="menu-bank"></div>
@@ -45,11 +50,11 @@
         </div>
       </div>
       <div class="menu-bank"></div>
-      <div class="menu-item" @click="offlineSyn()">
+      <div class="menu-item" @click="fileDownload()">
         <div class="menu-item-inner" style="background-color:#e87475">
           <img class="menu-icon" src="../assets/img/icon_data.png">
           <br/>
-          <span class="menu-font">题库同步</span>
+          <span class="menu-font">文件学习</span>
         </div>
       </div>
       <div class="menu-bank"></div>
@@ -70,8 +75,6 @@
 				userName: localStorage.getItem("userName"),
 				// 所属单位
 				userUnits: localStorage.getItem("userUnits"),
-				// 试题同步URL
-				offlineSynUrl: "examination/getQuestionsByType",
 				// 获取在线考试试题
 				getQuestionsUrl: "/examination/getQuestions",
 				// 获取培训信息
@@ -86,7 +89,7 @@
 					examinationType: "1",
 					studentNo: localStorage.getItem("studentNo")
 				};
-
+        Indicator.open('试题生成中...');
 				this.postAxios(this.getQuestionsUrl, parms).then(data => {
 					if(data.returnCode === '0') {
 						// 学员是否参加考试Flag
@@ -104,25 +107,24 @@
 							localStorage.setItem("workType",data.workType);
 
 							// 获取培训类别、培训层次
-							var trainNo = data.trainNo;
-							this.postAxios(this.getTrainUrl, {trainNo: trainNo}).then(trainData => {
-								localStorage.setItem("trainType",trainData.type);
-								localStorage.setItem("trainLevel",trainData.level);
-							}).catch(trainErr => {
-								Toast('出现异常');
-							});
+							localStorage.setItem("trainType",data.trainType);
+              localStorage.setItem("trainLevel",data.trainLevel);
 
 							// 考试类型（1：在线考试，2：模拟考试）
-							localStorage.setItem("examinationType",'1');
+              localStorage.setItem("examinationType",'1');
+              Indicator.close();
 							this.$router.push('/examConfirm');
 						} else {
-							Toast("您已经参加过该考试");
+              Indicator.close();
+              Toast("您已经参加过该考试");
 						}
 					} else {
-						Toast(data.msg);
+            Indicator.close();
+            Toast(data.msg);
 					}
 				}).catch(err => {
-					Toast('出现异常');
+          Indicator.close();
+          Toast('出现异常');
 				});
 			},
 
@@ -139,22 +141,8 @@
 			offlineExam() {
 				this.$router.push('/offline');
 			},
-
-			// 试题同步
-			offlineSyn() {
-				Indicator.open('加载中...');
-				this.postAxios(this.offlineSynUrl).then(data => {
-					localStorage.setItem("offlineQuestions",JSON.stringify(data));
-					if(JSON.stringify(data).length > 0) {
-						Toast("同步成功");
-					} else {
-						Toast("同步失败，请检查服务器数据");
-					}
-					Indicator.close();
-				}).catch(err => {
-					Toast('出现异常', 'error');
-					Indicator.close();
-				});
+			fileDownload() {
+				this.$router.push('/fileDownload');
 			},
 			exit() {
 				MessageBox({
@@ -220,7 +208,7 @@
 }
 
 .top-left {
-  width:22%;
+  width:17%;
   height:100%;
   text-align:right;
   display:table-cell;
@@ -228,9 +216,9 @@
 }
 
 .top-mid {
-  width:70%;
+  width:75%;
   height:100%;
-  text-align:center;
+  text-align:left;
   display:table-cell;
   vertical-align:middle;
 }
@@ -266,7 +254,31 @@
 .banner-image {
   background-size:contain|cover;
   width:100%;
-  height: auto;
+  height:auto;
+}
+
+.banner {
+  width:100%;
+  height: 36vh;
+  background: url('../assets/img/banner.png') no-repeat;
+  background-size: auto 100%;
+  display:table;
+}
+
+.banner-text {
+  width:100%;
+  height:100%;
+  text-align:center;
+  display:table-cell;
+  vertical-align:middle;
+}
+
+.banner-font {
+  font-style:normal;
+  font-weight:bold;
+  font-size: 8vw;
+  font-family:微软雅黑;
+  color:#F53A00;
 }
 
 .div-menu-blank {
@@ -275,7 +287,14 @@
 
 .div-menu {
   width:100%;
-  height:25vh;
+  height:23vh;
+  display: flex;
+  justify-content: center;
+}
+
+.div-menu-bottom {
+   width:100%;
+  height:5vh;
   display: flex;
   justify-content: center;
 }
@@ -286,6 +305,12 @@
 
 .menu-item {
   width:47%;
+  height:100%;
+  display:table;
+}
+
+.menu-item-bottom {
+  width:97%;
   height:100%;
   display:table;
 }
@@ -304,5 +329,4 @@
   color:white;
   font-size: 4.5vw;
 }
-
 </style>

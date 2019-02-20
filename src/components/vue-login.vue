@@ -1,18 +1,22 @@
 <template>
 	<div id="login">
-		<div id="logo">
-			<img style="width:60vw" src="../assets/img/logo.png">
-		</div>
-		<!-- 操作区域 -->
-        <div class="operateDiv">
-			<!-- 身份证号码 -->
-			<mt-field  v-model="userIdcard" placeholder="请输入身份证号码" class="myinput" ></mt-field>
-			<!-- 登录和切换登录方式块 -->
-			<div>
-				<mt-button size="large" type="primary" class="mybutton" @click="onlineLogin()">登录</mt-button>
-				<!-- <mt-button size="large"   class="mybutton" @click="offlineLogin()">离线</mt-button> -->
+		<div id=“login-top” style="height:87vh">
+			<div id="logo">
+				<img style="height:120px" src="../assets/img/logo.png">
 			</div>
-        </div>
+			<!-- 操作区域 -->
+			<div class="operateDiv">
+				<!-- 身份证号码 -->
+				<mt-field  v-model="userIdcard" placeholder="请输入身份证号码" class="myinput" ></mt-field>
+				<!-- 登录和切换登录方式块 -->
+				<div>
+					<mt-button size="large" type="primary" class="mybutton" @click="onlineLogin()">登录</mt-button>
+				</div>
+			</div>
+		</div>
+		<div class="footBox"  style="height:8vh">
+			<span style="font-size: 14px;color:#676767;">山东黄金矿业（玲珑）有限公司</span>
+		</div>
 	</div>
 </template>
 <script>
@@ -56,9 +60,6 @@
 					Toast('出现异常');
 				});
 			},
-			offlineLogin() {
-				this.$router.push('offline');
-			}
 		}
 	}
 </script>
@@ -76,7 +77,6 @@
       border:1px solid rgb(234,234,234);
       border-radius:5px;
       min-height:41px;
-
     }
     .imgDiv {
       display: flex;
@@ -89,6 +89,12 @@
 		-moz-osx-font-smoothing: grayscale;
 		text-align: center;
 		color: #2c3e50;
-		margin-top: 60px;
+		margin-top: 5vh;
 	}
+.footBox {
+	width: 100%;
+	text-align: center;
+	color: #676767;
+}
+
 </style>

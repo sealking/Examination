@@ -2,7 +2,9 @@
 	<div>
 		<!-- 头部 -->
 		<div id="tab-bar">
-    		<mt-header title="离线学习" fixed style="font-size:18px">
+    		<mt-header title="离线学习" fixed style="font-size:16px">
+				<mt-button slot="left" style="font-size:14px" @click="$router.back(-1)">返回</mt-button>
+				<mt-button v-if="questiones.length === 0" slot="right" @click="offlineSyn()">试题同步</mt-button>
 				<mt-button v-if="questiones.length !== 0" slot="right" @click="showModal()">…</mt-button>
     		</mt-header>
   		</div>
@@ -121,6 +123,7 @@
 
 <script>
 	import { Toast } from 'mint-ui';
+	import { Indicator } from 'mint-ui';
 	import { MessageBox } from 'mint-ui';
 	
 	export default {
@@ -154,6 +157,8 @@
 				pullDownVisible: false,
 				// 获取题目类型
 				getDataTypeInfoUrl: "/common/getDataTypeInfo",
+				// 试题同步URL
+				offlineSynUrl: "examination/getQuestionsByType",
 				// 试题题库
 				allquestions: []
 			}
@@ -313,10 +318,43 @@
 					
 				} else {
 					this.trainingType = "";
-				}
+				}	
+			},
+			// 试题同步
+			offlineSyn() {
+				Indicator.open('同步中...');
+				this.postAxios(this.offlineSynUrl).then(data => {
+					if(JSON.stringify(data).length > 0) {
+						Toast("同步成功");
+						localStorage.setItem("offlineQuestions",JSON.stringify(data));
+						this.allquestions = data;
+						this.optionKey = '0';
+						this.optionValue = '请选择';
 
-				
-        }
+						// 获取题目类别
+						let valuesObj = new Object();
+						let valuesList = [{ key: '0', value: "请选择" }];
+
+						if(this.allquestions) {
+							this.allquestions.forEach(itemInfo => {
+								let valuesItem = new Object();
+								valuesItem.key = itemInfo.questionTypeKey;
+								valuesItem.value = itemInfo.questionTypeValue;
+								valuesList.push(valuesItem);
+							});
+						}
+						valuesObj.values = valuesList;
+						this.questionsTypeOptions = [];
+						this.questionsTypeOptions.push(valuesObj);
+					} else {
+						Toast("同步失败，请检查服务器数据");
+					}
+					Indicator.close();
+				}).catch(err => {
+					Toast('出现异常', 'error');
+					Indicator.close();
+				});
+			}
 		},
 		mounted() {
 			

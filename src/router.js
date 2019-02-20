@@ -8,7 +8,7 @@ export default new Router({
   routes: [
     {
       path: '/login',
-      name: 'vue-login.vue',
+      name: 'login',
       component: () => import('./components/vue-login.vue')
     },
     {
@@ -40,6 +40,11 @@ export default new Router({
       path: '/scoreConfirm',
       name: 'scoreConfirm',
       component: () => import('./components/vue-scoreConfirm.vue')
+    },
+    {
+      path: '/fileDownload',
+      name: 'fileDownload',
+      component: () => import('./components/vue-fileDownload.vue')
     }
   ]
 })
