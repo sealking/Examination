@@ -5,12 +5,6 @@
       <div class="top-mid">
         <span class="title-font">安全生产在线模拟考试平台</span>
       </div>
-      <div class="top-left">
-        <span class="name-font">{{userName}}</span>
-      </div>
-      <div class="top-right">
-          <img class="logout-image" src="../assets/img/logout.png" @click="exit()">
-      </div>
       <div class="top-blank"></div>
     </div>
   	<!-- <div><img class="banner-image" src="../assets/img/banner.png" ></div> -->
@@ -140,55 +134,10 @@
 			// 离线学习
 			offlineExam() {
 				this.$router.push('/offline');
-			},
+      },
+      // 文件学习
 			fileDownload() {
 				this.$router.push('/fileDownload');
-			},
-			exit() {
-				MessageBox({
-					title: '提示',
-					message: '确定是否退出',
-					showConfirmButton: true,
-					showCancelButton: true
-					})
-					.then(action => {
-						if (action == 'confirm') { //确认的回调
-							// 学员编号
-							localStorage.setItem("studentNo", '');
-							// 设置用户的身份证号
-							localStorage.setItem("userIdcard",'');
-							// 设置姓名
-							localStorage.setItem("userName",'');
-							// 设置所属单位
-							localStorage.setItem("userUnits",'');
-							// 试题信息
-							localStorage.setItem("questionInfoList",JSON.stringify([]));
-							// 考试分钟数
-							localStorage.setItem("examinationMinute",0);
-							// 培训编号
-							localStorage.setItem("trainNo",'');
-							// 考试编号
-							localStorage.setItem("examinationNo",'');
-							// 工种岗位
-							localStorage.setItem("workType",'');
-							// 培训类别
-							localStorage.setItem("trainType",'');
-							// 培训层次
-							localStorage.setItem("trainLevel",'');
-							// 考试类型（1：在线考试，2：模拟考试）
-							localStorage.setItem("examinationType",'');
-							// 分数
-							localStorage.setItem("score", 0);
-							// 回答的题数
-							localStorage.setItem("answerNumber", 0);
-							// 总题数
-							localStorage.setItem("totalNumber", 0);
-							this.$router.push('/login');
-						}
-					}).catch(err => { 
-						Toast('出现异常');
- 					});
-				
 			}
 		}
 	}
@@ -216,9 +165,7 @@
 }
 
 .top-mid {
-  width:75%;
-  height:100%;
-  text-align:left;
+  text-align:center;
   display:table-cell;
   vertical-align:middle;
 }
@@ -242,7 +189,7 @@
 .title-font {
   font-style:normal;
   font-weight:bold;
-  font-size: 5vw;
+  font-size: 6vw;
   font-family:微软雅黑;
   color:#FFFFFF;
 }
@@ -276,7 +223,7 @@
 .banner-font {
   font-style:normal;
   font-weight:bold;
-  font-size: 8vw;
+  font-size: 7vw;
   font-family:微软雅黑;
   color:#F53A00;
 }

@@ -49,6 +49,8 @@
 						localStorage.setItem("userIdcard",this.userIdcard);
 						// 设置姓名
 						localStorage.setItem("userName",data.name);
+						// 设置性别
+						localStorage.setItem("userSex",data.sex);
 						// 设置所属单位
 						localStorage.setItem("userUnits",data.units);
 						// 跳转到登录确认页面
