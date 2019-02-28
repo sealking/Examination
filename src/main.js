@@ -6,7 +6,7 @@ import Mint from 'mint-ui';
 import "mint-ui/lib/style.css";
 import Mui from 'vue-awesome-mui';
 // import "vue-awesome-mui/mui/dist/css/mui.css";
-
+import './assets/css/iconfont/iconfont.css'
 
 
 Vue.config.devtools = true

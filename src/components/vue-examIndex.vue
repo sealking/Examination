@@ -305,6 +305,7 @@
 								let option = {
 								stuNo: localStorage.getItem("studentNo"),
 								examNo: localStorage.getItem("examinationNo"),
+								examinationType: "1",
 								score: this.score
 								}
 								// 更新成绩表中的是否考试Flg
@@ -330,10 +331,22 @@
 						Toast('出现异常');
 					});
 				} else {
-					localStorage.setItem("score", this.score);
-					localStorage.setItem("answerNumber", this.answerNumber);
-					localStorage.setItem("totalNumber", this.totalNumber);
-					this.$router.push('scoreConfirm');
+					let mockParms = {
+						examinationType: "2",
+						stuNo: localStorage.getItem("studentNo"),
+						trainNo: localStorage.getItem("trainNo"),
+						settingDate: localStorage.getItem("questionsSettingDate"),
+						score: this.score
+					};
+
+					this.postAxios(this.updateScoreUrl, mockParms).then(data => {
+						localStorage.setItem("score", this.score);
+						localStorage.setItem("answerNumber", this.answerNumber);
+						localStorage.setItem("totalNumber", this.totalNumber);
+						this.$router.push('scoreConfirm');
+					}).catch(err => {
+						Toast('出现异常');
+					});
 				}
 			}
 		},

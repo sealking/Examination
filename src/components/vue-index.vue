@@ -234,7 +234,7 @@
 
 .div-menu {
   width:100%;
-  height:23vh;
+  height:22vh;
   display: flex;
   justify-content: center;
 }

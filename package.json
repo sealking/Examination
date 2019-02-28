@@ -13,6 +13,8 @@
     "less": "^3.9.0",
     "less-loader": "^4.1.0",
     "mint-ui": "^2.2.13",
+    "stylus": "^0.54.5",
+    "stylus-loader": "^3.0.2",
     "vue": "^2.5.17",
     "vue-awesome-mui": "^1.7.3",
     "vue-router": "^3.0.1"

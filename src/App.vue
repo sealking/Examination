@@ -1,7 +1,7 @@
 <template>
 	<div id="app">
 		<router-view/>
-		<vFooter v-if="$route.meta.showFooter" :mySelected="mySelected">></vFooter>
+		<vFooter v-if="$route.meta.showFooter"></vFooter>
 	</div>
 </template>
 
@@ -26,14 +26,6 @@
 					} else {
 						this.$router.push('/login');
 					}
-				}
-
-				if(to.name === 'index') {
-					this.mySelected = 'index';
-				} else if(to.name === 'myPage') {
-					this.mySelected = 'myPage';
-				} else {
-					this.mySelected = '';
 				}
   			}
 		},

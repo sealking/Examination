@@ -97,11 +97,11 @@
 				return true;
 			},
 
-			handleClickTrainingType() {
+			handleClickTrainingTypehandleClickTrainingType() {
 				if(this.examinationType !== '1') {
 					this.trainingTypeVisible = true;
 				}
-    		},
+    	},
 			handleClickTrainingLevel() {
 				if(this.examinationType !== '1') {
 					this.trainingLevelVisible = true;

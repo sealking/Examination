@@ -53,6 +53,10 @@
 						localStorage.setItem("questionInfoList",JSON.stringify(data.questionInfoList));
 						// 考试分钟数
 						localStorage.setItem("examinationMinute",data.examinationMinute);
+						// 模拟考试设定时间
+						localStorage.setItem("questionsSettingDate",data.settingDate);
+						// 培训编号
+						localStorage.setItem("trainNo",data.trainNo);
 						Indicator.close();
 						this.$router.replace('examIndex');
 					} else {
@@ -77,6 +81,10 @@
 						localStorage.setItem("questionInfoList",JSON.stringify(data.questionInfoList));
 						// 考试分钟数
 						localStorage.setItem("examinationMinute",data.examinationMinute);
+						// 模拟考试设定时间
+						localStorage.setItem("questionsSettingDate",item.settingDate);
+						// 培训编号
+						localStorage.setItem("trainNo",data.trainNo);
 						Indicator.close();
 						this.$router.replace('examIndex');
 					} else {
