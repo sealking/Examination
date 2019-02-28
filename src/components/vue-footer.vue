@@ -14,14 +14,14 @@
     <footer class="footer_guide border-1px">
     <div class="guide_item" @click="goto('/')" :class="{on: isCurrent('/')}">
     <span>
-    <i class="iconfont icon-shouye"></i>
+    <i class="iconfont iconshouye"></i>
     </span>
     <span>首页</span>
     </div>
 
     <div class="guide_item" @click="goto('/myPage')" :class="{on: isCurrent('/myPage')}">
     <span>
-    <i class="iconfont icon-wode-active"></i>
+    <i class="iconfont iconwode-active"></i>
     </span>
     <span>我的</span>
     </div>
