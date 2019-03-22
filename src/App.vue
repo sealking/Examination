@@ -12,7 +12,8 @@
 		name: "App",
 		data() {
 			return {
-				mySelected: 'index'
+				mySelected: 'index',
+				timer: null
 			}
 		},
 		// 监听,当路由发生变化的时候执行
@@ -31,8 +32,13 @@
 		},
 		components:{
             vFooter
-        },
+		},
+		methods: {
+
+		},
 		mounted() {
+			//this.$router.push('/boot');
+			
 			let studentNo = localStorage.getItem("studentNo");
 			if(studentNo) {
 				this.$router.push('/');

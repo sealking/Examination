@@ -13,22 +13,70 @@
 			<span style="color: green">{{trainingLevel}}</span>
 		</mt-cell>
 
-		<mt-cell style="text-align:left" title="工种岗位" is-link @click.native="handleClickWorkType">
+		<mt-cell style="text-align:left" title="专业内容" is-link @click.native="handleClickWorkType">
 			<span style="color: green">{{workType}}</span>
 		</mt-cell>
 
+		<mt-cell style="text-align:left" title="考试题库" is-link @click.native="handleClickQuestions">
+			<span style="color: green">{{questions}}</span>
+		</mt-cell>
+
 		<mt-popup v-model="trainingTypeVisible" position="bottom" style="width:100vw">
-			<mt-picker :slots="trainingTypeOptions" @change="onTypeValuesChange" valueKey="value"></mt-picker>
+			<mt-picker :slots="trainingTypeOptions" valueKey="value" 
+			:visible-item-count="5" :show-toolbar="true" ref="trainingTypePicker">
+				<div style="display:table;width:100vw">
+					<div style="text-align:left;padding:5px;width:50vw;display:table-cell;">
+						<mt-button @click="handleClickTrainingType" type="primary" size="small">取消</mt-button>
+					</div>
+					<div style="text-align:right;padding:5px;width:50vw;ddisplay:table-cell;">
+						<mt-button @click="onTypeValuesChange" type="primary" size="small">确认</mt-button>
+					</div>
+				</div>
+			</mt-picker>
 		</mt-popup>
 
 		<mt-popup v-model="trainingLevelVisible" position="bottom" style="width:100vw">
-		<mt-picker :slots="trainingLevelOptions" @change="onLevelValuesChange" valueKey="value"></mt-picker>
+			<mt-picker :slots="trainingLevelOptions" valueKey="value"
+			:visible-item-count="5" :show-toolbar="true" ref="trainingLevelPicker">
+				<div style="display:table;width:100vw">
+					<div style="text-align:left;padding:5px;width:50vw;display:table-cell;">
+						<mt-button @click="handleClickTrainingLevel" type="primary" size="small">取消</mt-button>
+					</div>
+					<div style="text-align:right;padding:5px;width:50vw;ddisplay:table-cell;">
+						<mt-button @click="onLevelValuesChange" type="primary" size="small">确认</mt-button>
+					</div>
+				</div>
+			</mt-picker>
 		</mt-popup>
 
 		<mt-popup v-model="workTypeVisible" position="bottom" style="width:100vw">
-		<mt-picker :slots="workTypeOptions" @change="onProfessionValuesChange" valueKey="value"></mt-picker>
+			<mt-picker :slots="workTypeOptions" valueKey="value"
+			:visible-item-count="5" :show-toolbar="true" ref="workTypePicker">
+				<div style="display:table;width:100vw">
+					<div style="text-align:left;padding:5px;width:50vw;display:table-cell;">
+						<mt-button @click="handleClickWorkType" type="primary" size="small">取消</mt-button>
+					</div>
+					<div style="text-align:right;padding:5px;width:50vw;display:table-cell;">
+						<mt-button @click="onWorkTypeValuesChange" type="primary" size="small">确认</mt-button>
+					</div>
+				</div>
+			</mt-picker>
 		</mt-popup>
-		<div style="text-align: left;padding-left: 10px;padding-right: 20px;">题库种类：{{questionsType}}</div>
+
+		<mt-popup v-model="questionsVisible" position="bottom" style="width:100vw">
+			<mt-picker :slots="questionsOptions" valueKey="value"
+			:visible-item-count="5" :show-toolbar="true" ref="questionsPicker">
+				<div style="display:table;width:100vw">
+					<div style="text-align:left;padding:5px;width:50vw;display:table-cell;">
+						<mt-button @click="handleClickQuestions" type="primary" size="small">取消</mt-button>
+					</div>
+					<div style="text-align:right;padding:5px;width:50vw;display:table-cell;">
+						<mt-button @click="onQuestionsValuesChange" type="primary" size="small">确认</mt-button>
+					</div>
+				</div>
+			</mt-picker>
+		</mt-popup>
+		<!--<div style="text-align: left;padding-left: 10px;padding-right: 20px;">题库种类：{{questionsType}}</div>-->
     	<div class="footBox">
 				<mt-button v-if="examinationType === '1'" size="large" type="primary" class="mybutton" @click="onlineOnClick()">在线考试</mt-button>
 				<mt-button v-if="examinationType === '2'" size="large" type="primary" class="mybutton" @click="mockOnClick()">模拟考试</mt-button>
@@ -37,112 +85,267 @@
 </template>
 <script>
 	import { Toast } from 'mint-ui';
+	import { Indicator } from 'mint-ui';
+
 	export default {
 		data() {
 			return {
 				// 考试类型（1：在线考试，2：模拟考试）
 				examinationType: localStorage.getItem("examinationType"),
+				// 学员类别
+				studentType: localStorage.getItem("userType"),
+				// 学员组织ID
+				userUnitsId: localStorage.getItem("userUnitsId"),
 				// 培训类别Options
 				trainingTypeOptions: [],
 				// 培训层次Options
 				trainingLevelOptions: [],
-				// 工种岗位Options
+				// 专业内容Options
 				workTypeOptions: [],
+				// 考试题库Options
+				questionsOptions: [],
 				// 培训类别选中数据
 				trainingType: "",
 				// 培训层次选中数据
 				trainingLevel: "",
-				// 工种岗位选中数据
+				// 专业内容选中数据
 				workType: "",
-				// 培训类别选中数据
+				// 考试题库选中的数据
+				questions: "",
+				// 培训类别选中数据key
 				trainingTypeKey: "",
-				// 培训层次选中数据
+				// 培训层次选中数据key
 				trainingLevelKey: "",
-				// 工种岗位选中数据
+				// 专业内容选中数据key
 				workTypeKey: "",
+				// 考试题库选中的数据
+				questionsKey: "",
 				// 题库种类
-				questionsType: "",
+				//questionsType: "",
 				// 获取字典信息URL
 				getDataTypeInfoUrl: "/common/getDataTypeInfo",
 				// 获取题库种类URL
-				getQuestionsTypeUrl: "/examination/getQuestionsType",
+				//getQuestionsTypeUrl: "/examination/getQuestionsType",
 				// 更新分数URL
 				updateScoreUrl: "/examination/updateScore",
 				// 根据code获取数据字典信息
-				getTypeInfoByDetailCodeUrl: "common/getDataTypeInfoByDetailCode",
+				getTypeInfoByDetailCodeUrl: "/common/getDataTypeInfoByDetailCode",
+				// 获取考试题库
+				getQuestionBankUrl: "/examination/getQuestionBank",
+				// 获取在线考试试题
+				getQuestionsUrl: "/examination/getQuestions",
 				// 培训类别popup显示Flag
 				trainingTypeVisible: false,
 				// 培训层次popup显示Flag
 				trainingLevelVisible: false,
 				// 工种popup显示Flag
 				workTypeVisible: false,
+				// 题库popup显示Flag
+				questionsVisible: false
 			}
 		},
 		methods: {
 			onlineOnClick() {
-				this.$router.replace('/examIndex');
+				if(this.dataValid()) {
+					let parms = {
+						examinationType: "1",
+						studentNo: localStorage.getItem("studentNo"),
+						questionBankId: this.questionsKey
+					};
+					Indicator.open('试题生成中...');
+					this.postAxios(this.getQuestionsUrl, parms).then(data => {
+						if(data.returnCode === '0') {
+							// 学员是否参加考试Flag
+							let isExamFlag = data.isExamFlag;
+							if('1' !== isExamFlag) {
+								// 试题信息
+								localStorage.setItem("questionInfoList",JSON.stringify(data.questionInfoList));
+								// 考试分钟数
+								localStorage.setItem("examinationMinute",data.examinationMinute);
+								// 培训编号
+								localStorage.setItem("trainNo",data.trainNo);
+								// 考试编号
+								localStorage.setItem("examinationNo",data.examinationNo);
+								Indicator.close();
+								localStorage.setItem("questionBank",this.questionsKey);
+								this.$router.replace('examIndex');
+							} else {
+								Indicator.close();
+								Toast("您已经参加过该考试");
+							}
+						} else {
+							Indicator.close();
+							Toast(data.msg);
+						}
+					}).catch(err => {
+						Indicator.close();
+						Toast('出现异常');
+					});
+				}
 			},
 			mockOnClick() {
 				if(this.dataValid()) {
-					localStorage.setItem("workType",this.workTypeKey);
+					localStorage.setItem("questionBank",this.questionsKey);
 					this.$router.replace('mockQuestionSelect');
 				}
 			},
 
 			dataValid() {
-				if(this.workTypeKey === '0') {
-					Toast('工种岗位不能为空，请选择');
+				if(this.trainingTypeKey === '0') {
+					Toast('培训类别不能为空，请选择');
 					return false;
 				}
+
+				if(this.trainingLevelKey === '0') {
+					Toast('培训层次不能为空，请选择');
+					return false;
+				}
+
+				if(this.workTypeKey === '0') {
+					Toast('专业内容不能为空，请选择');
+					return false;
+				}
+
+				if(this.questionsKey === '0') {
+					Toast('考试题库不能为空，请选择');
+					return false;
+				}
+
 				return true;
 			},
 
-			handleClickTrainingTypehandleClickTrainingType() {
-				if(this.examinationType !== '1') {
+			handleClickTrainingType() {
+				//if(this.examinationType !== '1') {
+				if (this.trainingTypeVisible) {
+					this.trainingTypeVisible = false;
+				} else {
 					this.trainingTypeVisible = true;
 				}
+					
+				//}
     	},
 			handleClickTrainingLevel() {
-				if(this.examinationType !== '1') {
+				//if(this.examinationType !== '1') {
+				if(this.trainingLevelVisible) {
+					this.trainingLevelVisible = false;
+				} else {
 					this.trainingLevelVisible = true;
 				}
+					
+				//}
 			},
 			handleClickWorkType() {
-				if(this.examinationType !== '1') {
+				//if(this.examinationType !== '1') {
+				if(this.workTypeVisible) {
+					this.workTypeVisible = false;
+				} else {
 					this.workTypeVisible = true;
 				}
+					
+				//}
 			},
-			onTypeValuesChange(picker, values) {
-				if (picker.getSlotValue(0) != null) {
-					this.trainingTypeKey = picker.getValues()[0].key;
-					this.trainingType = picker.getValues()[0].value;
+			handleClickQuestions() {
+				if(this.trainingTypeKey === '0') {
+					Toast('培训类别不能为空，请选择');
+					return;
+				}
+
+				if(this.trainingLevelKey === '0') {
+					Toast('培训层次不能为空，请选择');
+					return;
+				}
+
+				if(this.workTypeKey === '0') {
+					Toast('专业内容不能为空，请选择');
+					return;
+				}
+
+				if(this.questionsVisible) {
+					this.questionsVisible = false;
+				} else {
+					this.questionsVisible = true;
+				}
+				
+			},
+			onTypeValuesChange() {
+				if (this.$refs.trainingTypePicker.getSlotValue(0) != null) {
+					this.trainingTypeKey = this.$refs.trainingTypePicker.getValues()[0].key;
+					this.trainingType = this.$refs.trainingTypePicker.getValues()[0].value;
 					this.trainingTypeVisible = false;
 				} else {
 					this.trainingType = "";
 				}
+				this.getQuestionsValues();
 			},
-			onLevelValuesChange(picker, values) {
-				if (picker.getSlotValue(0) != null) {
-					this.trainingLevelKey = picker.getValues()[0].key;
-					this.trainingLevel = picker.getValues()[0].value;
+			onLevelValuesChange() {
+				if (this.$refs.trainingLevelPicker.getSlotValue(0) != null) {
+					this.trainingLevelKey = this.$refs.trainingLevelPicker.getValues()[0].key;
+					this.trainingLevel = this.$refs.trainingLevelPicker.getValues()[0].value;
 					this.trainingLevelVisible = false;
 				} else {
 					this.trainingLevel = "";
 				}
+				this.getQuestionsValues();
 			},
-			onProfessionValuesChange(picker, values) {
-				if (picker.getSlotValue(0) != null) {
-					this.workTypeKey = picker.getValues()[0].key;
-					this.workType = picker.getValues()[0].value;
+			onWorkTypeValuesChange() {
+				if (this.$refs.workTypePicker.getSlotValue(0) != null) {
+					this.workTypeKey = this.$refs.workTypePicker.getValues()[0].key;
+					this.workType = this.$refs.workTypePicker.getValues()[0].value;
 					this.workTypeVisible = false;
-					// 获取题库种类
-					this.postAxios(this.getQuestionsTypeUrl, {workTypeCode: this.workTypeKey}).then(data => {
-						this.questionsType = data.questionsType;
+					// // 获取题库种类
+					// this.postAxios(this.getQuestionsTypeUrl, {workTypeCode: this.workTypeKey}).then(data => {
+					// 	this.questionsType = data.questionsType;
+					// }).catch(err => {
+					// 	Toast('出现异常');
+					// });
+				} else {
+					this.workType = "";
+				}
+				this.getQuestionsValues();
+			},
+			onQuestionsValuesChange() {
+				if (this.$refs.questionsPicker.getSlotValue(0) != null) {
+					this.questionsKey = this.$refs.questionsPicker.getValues()[0].key;
+					this.questions = this.$refs.questionsPicker.getValues()[0].value;
+					this.questionsVisible = false;
+				} else {
+					this.questions = "";
+				}
+			},
+			getQuestionsValues() {
+				this.questionsKey = '0';
+				this.questions = '请选择';
+				//  培训类别,培训层次,专业内容为空时
+				if(this.trainingTypeKey === '0' || this.trainingTypeKey === ''|| this.trainingLevelKey === '0' || this.trainingLevelKey === ''|| this.workTypeKey === '0' || this.workTypeKey === '') {
+
+				} else {
+					let valuesInfoList = [{ key: '0', value: "请选择" }];
+					let parms = {
+						// 考试类型
+						examinationType: this.examinationType,
+						// 培训类型
+						trainingType: this.trainingTypeKey,
+						// 培训层次
+						trainingLevel: this.trainingLevelKey,
+						// 专业内容
+						workType: this.workTypeKey,
+						// 学员类型
+						studentType: this.studentType,
+						// 学员组织ID
+						userUnitsId: this.userUnitsId
+					}
+
+					// 获取考试题库
+					this.postAxios(this.getQuestionBankUrl, parms).then(data => {
+						data.forEach(dataInfo => {
+							var valuesInfo = {key: dataInfo.questionBankId, value: dataInfo.questionBankId };
+							valuesInfoList.push(valuesInfo);
+						});
 					}).catch(err => {
 						Toast('出现异常');
 					});
-				} else {
-					this.workType = "";
+					let temp = {values: valuesInfoList};
+					this.questionsOptions = [temp];
 				}
 			}
 		},
@@ -184,48 +387,59 @@
 				Toast('出现异常');
 			});
 			
-			// 在线考试
-			if(this.examinationType === '1') {
-				this.trainingTypeKey = localStorage.getItem("trainType");
-				this.trainingLevelKey = localStorage.getItem("trainLevel");
-				this.workTypeKey = localStorage.getItem("workType");
+			// // 在线考试
+			// if(this.examinationType === '1') {
+			// 	this.trainingTypeKey = localStorage.getItem("trainType");
+			// 	this.trainingLevelKey = localStorage.getItem("trainLevel");
+			// 	this.workTypeKey = localStorage.getItem("workType");
 
-				// 获取培训类别
-				this.postAxios(this.getTypeInfoByDetailCodeUrl, {typeCode: 'pxlb', typeDetailCode: this.trainingTypeKey}).then(data => {
-					this.trainingType = data.typeDetailName;
-				}).catch(err => {
-					Toast('出现异常');
-				});
+			// 	// 获取培训类别
+			// 	this.postAxios(this.getTypeInfoByDetailCodeUrl, {typeCode: 'pxlb', typeDetailCode: this.trainingTypeKey}).then(data => {
+			// 		this.trainingType = data.typeDetailName;
+			// 	}).catch(err => {
+			// 		Toast('出现异常');
+			// 	});
 
-				// 获取培训类别
-				this.postAxios(this.getTypeInfoByDetailCodeUrl, {typeCode: 'pxcc', typeDetailCode: this.trainingLevelKey}).then(data => {
-					this.trainingLevel = data.typeDetailName
-				}).catch(err => {
-					Toast('出现异常');
-				});
+			// 	// 获取培训类别
+			// 	this.postAxios(this.getTypeInfoByDetailCodeUrl, {typeCode: 'pxcc', typeDetailCode: this.trainingLevelKey}).then(data => {
+			// 		this.trainingLevel = data.typeDetailName
+			// 	}).catch(err => {
+			// 		Toast('出现异常');
+			// 	});
 
-				// 获取工种
-				this.postAxios(this.getTypeInfoByDetailCodeUrl, {typeCode: 'gz', typeDetailCode: this.workTypeKey}).then(data => {
-					this.workType = data.typeDetailName
-				}).catch(err => {
-					Toast('出现异常');
-				});
+			// 	// 获取工种
+			// 	this.postAxios(this.getTypeInfoByDetailCodeUrl, {typeCode: 'gz', typeDetailCode: this.workTypeKey}).then(data => {
+			// 		this.workType = data.typeDetailName
+			// 	}).catch(err => {
+			// 		Toast('出现异常');
+			// 	});
 
-				// 获取题库种类
-				this.postAxios(this.getQuestionsTypeUrl, {workTypeCode: this.workTypeKey}).then(data => {
-					this.questionsType = data.questionsType;
-				}).catch(err => {
-					Toast('出现异常');
-				});
-			} else {
+			// 	// 获取题库种类
+			// 	this.postAxios(this.getQuestionsTypeUrl, {workTypeCode: this.workTypeKey}).then(data => {
+			// 		this.questionsType = data.questionsType;
+			// 	}).catch(err => {
+			// 		Toast('出现异常');
+			// 	});
+			// } else {
+			// 	this.trainingTypeKey = '0';
+			// 	this.trainingLevelKey = '0';
+			// 	this.workTypeKey = '0';
+			// 	this.questionsKey = '0';
+
+			// 	this.trainingType = '请选择';
+			// 	this.trainingLevel = '请选择';
+			// 	this.workType = '请选择';
+			// 	this.questions = '请选择';
+			// }
 				this.trainingTypeKey = '0';
 				this.trainingLevelKey = '0';
 				this.workTypeKey = '0';
+				this.questionsKey = '0';
 
 				this.trainingType = '请选择';
 				this.trainingLevel = '请选择';
 				this.workType = '请选择';
-			}
+				this.questions = '请选择';
 		}
 	}
 </script>

@@ -7,6 +7,15 @@ Vue.use(Router)
 export default new Router({
   routes: [
     {
+      path: '/boot',
+      name: 'boot',
+      component: () => import('./components/vue-boot.vue'),
+      meta: {
+        // 底部是否显示
+        showFooter: false
+      }
+    },
+    {
       path: '/login',
       name: 'login',
       component: () => import('./components/vue-login.vue'),

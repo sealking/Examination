@@ -5,6 +5,42 @@
 				<mt-button slot="right" @click="exit()">退出登录</mt-button>
 			</mt-header>
 		</div>
+		<div class="person">
+			<div class="person-left">
+				<img v-if="sex === '1'" style="height:100px" src="../assets/img/man.png">
+				<img v-else style="height:100px" src="../assets/img/women.png">
+			</div>
+			<div class="person-middle">
+				<div style="text-align:left;"><span style="font-size:26px;  ">{{userName}}</span></div>
+				<div style="text-align:left;">{{userSex}}</div>
+				<div style="text-align:left;">{{userIdcard}}</div>
+				<div style="text-align:left;">{{userUnits }}</div>
+			</div>
+			<div class="person-right">
+				<div style="text-align:left;"><span style="font-size:10px">学习排名：{{studyRanking}}</span></div>
+				<div style="text-align:left;"><span style="font-size:10px">学习成绩：{{studyScore}}</span></div>
+				<div style="text-align:left;"><span style="font-size:10px">考试排名：{{examRanking}}</span></div>
+				<div style="text-align:left;"><span style="font-size:10px">考试成绩：{{examScore}}</span></div>
+			</div>
+		</div>
+		<div>
+			<mt-cell style="background-color:#26a2ff;text-align:left" title="培训列表" is-link @click.native="handleClickTrain">
+				<span style="color: #ffffff">{{trainName}}</span>
+			</mt-cell>
+			<mt-popup v-model="trainListVisible" position="bottom" style="width:100vw">
+				<mt-picker :slots="trainList" valueKey="value" :visible-item-count="5" :show-toolbar="true" ref="picker">
+					<div style="display:table;width:100vw">
+						<div style="text-align:left;padding:5px;width:50vw;display:table-cell;">
+							<mt-button @click="handleClickTrain" type="primary" size="small">取消</mt-button>
+						</div>
+						<div style="text-align:right;padding:5px;width:50vw;display:table-cell;">
+							<mt-button @click="onTrainChange" type="primary" size="small">确认</mt-button>
+						</div>
+					</div>
+				</mt-picker>
+			</mt-popup>
+		</div>
+		<!-- 
 		<div style="height:40vh">
         <mt-cell :title="userName"></mt-cell>
         <mt-cell :title="userSex"></mt-cell>
@@ -16,6 +52,7 @@
 		<mt-popup v-model="trainListVisible" position="bottom" style="width:100vw">
 			<mt-picker :slots="trainList" @change="onTrainChange" valueKey="value"></mt-picker>
 		</mt-popup>
+		-->
 		<mt-navbar v-model="ranking">
   			<mt-tab-item id="1"><span style="font-size:16px">学习排名</span></mt-tab-item>
   			<mt-tab-item id="2"><span style="font-size:16px">考试排名</span></mt-tab-item>
@@ -34,10 +71,15 @@
 					:key="item.studentNo"
 					:style="item.studentNo === studentNo? 'background-color:#FFF8DC': 'background-color:#FFFFFF'"
 				>
-					<div style="margin-left:15px;width:40px">{{index + 1}}</div>
-					<div style="margin-left:15px;width:40px">{{item.examCount}}</div>
-					<div style="margin-left:15px;width:40px">{{item.questionCount}}</div>
-					<div style="margin-left:15px;width:50px">{{item.studentScore}}</div>
+					<div style="margin-left:15px;width:40px">
+						<div v-if="index==0"><img style="height:35px" src="../assets/img/1.png"></div>
+						<div v-else-if="index==1"><img style="height:35px" src="../assets/img/2.png"></div>
+						<div v-else-if="index==2"><img style="height:35px" src="../assets/img/3.png"></div>
+						<div v-else style="text-align:center">{{index + 1}}</div>
+					</div>
+					<div style="margin-left:15px;width:40px;text-align:center">{{item.examCount}}</div>
+					<div style="margin-left:15px;width:40px;text-align:center">{{item.questionCount}}</div>
+					<div style="margin-left:15px;width:50px;text-align:center">{{item.studentScore}}</div>
 				</mt-cell>
 			</mt-tab-container-item>
 			<mt-tab-container-item id="2">
@@ -51,8 +93,13 @@
 					:key="item.studentNo"
 					:style="item.studentNo === studentNo? 'background-color:#FFF8DC': 'background-color:#FFFFFF'"
 				>
-					<div style="margin-left:15px;width:40px">{{index + 1}}</div>
-					<div style="margin-left:15px;width:50px">{{item.studentScore}}</div>
+					<div style="margin-left:15px;width:40px">
+						<div v-if="index==0"><img style="height:35px" src="../assets/img/1.png"></div>
+						<div v-else-if="index==1"><img style="height:35px" src="../assets/img/2.png"></div>
+						<div v-else-if="index==2"><img style="height:35px" src="../assets/img/3.png"></div>
+						<div v-else style="text-align:center">{{index + 1}}</div>
+					</div>
+					<div style="margin-left:15px;width:50px;text-align:center">{{item.studentScore}}</div>
 				</mt-cell>
 			</mt-tab-container-item>
 		</mt-tab-container>
@@ -75,7 +122,8 @@
 				// 学员姓名
                 userName: localStorage.getItem("userName"),
                 // 学员性别
-                userSex: localStorage.getItem("userSex"),
+				userSex: '',
+				sex: localStorage.getItem('userSex'),
 				// 所属单位
 				userUnits: localStorage.getItem("userUnits"),
 				// 培训popup显示Flag
@@ -97,7 +145,15 @@
 				// 获取用户的培训信息Url
 				getTrainByStuNoUrl: "/examination/getTrainByStuNo",
 				// 获取排名信息
-				getRankingUrl: "/examination/getRanking"
+				getRankingUrl: "/examination/getRanking",
+				// 学习排名
+				studyRanking: 0,
+				// 学习成绩
+				studyScore: 0,
+				// 考试排名
+				examRanking: 0,
+				// 考试成绩
+				examScore: 0
 			}
 		},
 		methods: {
@@ -121,6 +177,8 @@
                         localStorage.setItem("userSex",'');
 						// 设置所属单位
 						localStorage.setItem("userUnits",'');
+						// 设置所属单位ID
+						localStorage.setItem("userUnitsId",'');
 						// 试题信息
 						localStorage.setItem("questionInfoList",JSON.stringify([]));
 						// 考试分钟数
@@ -129,12 +187,6 @@
 						localStorage.setItem("trainNo",'');
 						// 考试编号
 						localStorage.setItem("examinationNo",'');
-						// 工种岗位
-						localStorage.setItem("workType",'');
-						// 培训类别
-						localStorage.setItem("trainType",'');
-						// 培训层次
-						localStorage.setItem("trainLevel",'');
 						// 考试类型（1：在线考试，2：模拟考试）
 						localStorage.setItem("examinationType",'');
 						// 分数
@@ -143,6 +195,12 @@
 						localStorage.setItem("answerNumber", 0);
 						// 总题数
 						localStorage.setItem("totalNumber", 0);
+						// 题库编号
+						localStorage.setItem("questionBank",'');
+						// 设置学员类别
+						localStorage.setItem("userType",'');
+						// 考试设定时间
+						localStorage.setItem("questionsSettingDate",'');
 						this.$router.push('/login');
 					}
 				}).catch(err => { 
@@ -150,10 +208,10 @@
                 });
 			},
 			// 培训列表发生变化时
-			onTrainChange(picker, values) {
-				if (picker.getSlotValue(0) != null) {
-					this.trainValue = picker.getValues()[0].key;
-					this.trainName = picker.getValues()[0].value;
+			onTrainChange() {
+				if (this.$refs.picker.getSlotValue(0) != null) {
+					this.trainValue = this.$refs.picker.getValues()[0].key;
+					this.trainName = this.$refs.picker.getValues()[0].value;
 					this.trainListVisible = false;
 					this.getMockRanking();
 					this.getOnlineRanking();
@@ -162,7 +220,12 @@
 				}
 			},
 			handleClickTrain() {
-				this.trainListVisible = true;
+				if(this.trainListVisible) {
+					this.trainListVisible = false;
+				} else {
+					this.trainListVisible = true;
+				}
+				
     		},
 			// 获取用户的培训信息
 			getTrainByStuNo() {
@@ -200,7 +263,15 @@
 
 				this.postAxios(this.getRankingUrl, parm).then(data => {
 					this.mockRankingList = data;
-					
+					let ranking = 0;
+					data.forEach(dataInfo => {
+						ranking++;
+						if(dataInfo.studentNo === this.studentNo) {
+							this.studyRanking = ranking;
+							this.studyScore = dataInfo.studentScore;
+							return;
+						}
+					})
 				}).catch(err => {
 					Toast('出现异常');
 				});
@@ -214,6 +285,15 @@
 
 				this.postAxios(this.getRankingUrl, parm).then(data => {
 					this.onlineRankingList = data;
+					let ranking = 0;
+					data.forEach(dataInfo => {
+						ranking++;
+						if(dataInfo.studentNo === this.studentNo) {
+							this.examRanking = ranking;
+							this.examScore = dataInfo.studentScore;
+							return;
+						}
+					})
 				}).catch(err => {
 					Toast('出现异常');
 				});
@@ -225,9 +305,7 @@
             let startNum = idCard.length - 6;
             let endNum = idCard.length - 2;
             idCard = idCard.substring(0,startNum) + "****" + idCard.substring(endNum,idCard.length);
-            this.userIdcard = "身份证号码：" + idCard;
-			// 学员姓名
-            this.userName = "姓名：" + localStorage.getItem("userName");
+            this.userIdcard = idCard;
             // 学员性别
             let sex = localStorage.getItem("userSex");
             if(sex === '1') {
@@ -235,8 +313,6 @@
             } else {
                 this.userSex = "性别：女";
             }
-			// 所属单位
-			this.userUnits = "所属单位：" + localStorage.getItem("userUnits");
 
 			// 获取用户的培训信息
 			this.getTrainByStuNo();
@@ -252,4 +328,35 @@
 		border-bottom: solid 1px rgb(234, 234, 234);
 		padding-bottom: 30px;
 	}
+.person {
+	width:100%;
+	height:100px;
+	background-color:#26a2ff;
+	display:table;
+	padding-top:10px;
+	padding-bottom:10px;
+}
+.person-left {
+  width:5%;
+  height:100%;
+  text-align:left;
+  display:table-cell;
+  vertical-align:middle;
+}
+.person-middle {
+  width:60%;
+  height:100%;
+  text-align:middle;
+  display:table-cell;
+  vertical-align:middle;
+  color:#000000;
+}
+.person-right {
+  width:35%;
+  height:100%;
+  text-align:right;
+  display:table-cell;
+  vertical-align:middle;
+  color:#000000;
+}
 </style>

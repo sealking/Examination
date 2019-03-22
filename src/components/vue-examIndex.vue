@@ -296,36 +296,31 @@
 						studentNo: localStorage.getItem("studentNo")
 					};
 					this.postAxios(this.getQuestionsUrl, parms).then(data => {
-						if(data.returnCode === '0') {
-							let isExamFlag = data.isExamFlag;
-							if('1' === isExamFlag) {
-								Toast("您已经参加过该考试");
-								return;
-							} else {
-								let option = {
+						let isExamFlag = data.isExamFlag;
+						if('1' === isExamFlag) {
+							Toast("您已经参加过该考试");
+							return;
+						} else {
+							let option = {
 								stuNo: localStorage.getItem("studentNo"),
 								examNo: localStorage.getItem("examinationNo"),
 								examinationType: "1",
 								score: this.score
-								}
-								// 更新成绩表中的是否考试Flg
-								this.postAxios(this.updateExamFlagUrl, option).then(data => {
-								}).catch(err => {
-									Toast('出现异常');
-								});
-								// 提交分数
-								this.postAxios(this.updateScoreUrl,option).then(data => {
-									localStorage.setItem("score", this.score);
-									localStorage.setItem("answerNumber", this.answerNumber);
-									localStorage.setItem("totalNumber", this.totalNumber);
-									this.$router.replace('scoreConfirm');
-								}).catch(err => {
-									Toast('出现异常');
-								});
 							}
-						}else {
-							Toast(data.msg);
-							return;
+							// 更新成绩表中的是否考试Flg
+							this.postAxios(this.updateExamFlagUrl, option).then(data => {
+							}).catch(err => {
+								Toast('出现异常');
+							});
+							// 提交分数
+							this.postAxios(this.updateScoreUrl,option).then(data => {
+								localStorage.setItem("score", this.score);
+								localStorage.setItem("answerNumber", this.answerNumber);
+								localStorage.setItem("totalNumber", this.totalNumber);
+								this.$router.replace('scoreConfirm');
+							}).catch(err => {
+								Toast('出现异常');
+							});
 						}
 					}).catch(err => {
 						Toast('出现异常');

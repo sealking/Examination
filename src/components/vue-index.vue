@@ -69,8 +69,8 @@
 				userName: localStorage.getItem("userName"),
 				// 所属单位
 				userUnits: localStorage.getItem("userUnits"),
-				// 获取在线考试试题
-				getQuestionsUrl: "/examination/getQuestions",
+				// // 获取在线考试试题
+				// getQuestionsUrl: "/examination/getQuestions",
 				// 获取培训信息
 				getTrainUrl: "/examination/getTrainByNo"
 			}
@@ -78,48 +78,53 @@
 		methods: {
 			// 在线考试
 			onlineExam() {
-				// 获取在线考试试题
-				let parms = {
-					examinationType: "1",
-					studentNo: localStorage.getItem("studentNo")
-				};
-        Indicator.open('试题生成中...');
-				this.postAxios(this.getQuestionsUrl, parms).then(data => {
-					if(data.returnCode === '0') {
-						// 学员是否参加考试Flag
-						let isExamFlag = data.isExamFlag;
-						if('1' !== isExamFlag) {
-							// 试题信息
-							localStorage.setItem("questionInfoList",JSON.stringify(data.questionInfoList));
-							// 考试分钟数
-							localStorage.setItem("examinationMinute",data.examinationMinute);
-							// 培训编号
-							localStorage.setItem("trainNo",data.trainNo);
-							// 考试编号
-							localStorage.setItem("examinationNo",data.examinationNo);
-							// 工种岗位
-							localStorage.setItem("workType",data.workType);
+        // 考试类型（1：在线考试，2：模拟考试）
+				localStorage.setItem("examinationType",'1');
+				// 清空题库
+				localStorage.setItem("questionBank",'');
+				this.$router.push('/examConfirm');
+				// // 获取在线考试试题
+				// let parms = {
+				// 	examinationType: "1",
+				// 	studentNo: localStorage.getItem("studentNo")
+				// };
+        // Indicator.open('试题生成中...');
+				// this.postAxios(this.getQuestionsUrl, parms).then(data => {
+				// 	if(data.returnCode === '0') {
+				// 		// 学员是否参加考试Flag
+				// 		let isExamFlag = data.isExamFlag;
+				// 		if('1' !== isExamFlag) {
+				// 			// 试题信息
+				// 			localStorage.setItem("questionInfoList",JSON.stringify(data.questionInfoList));
+				// 			// 考试分钟数
+				// 			localStorage.setItem("examinationMinute",data.examinationMinute);
+				// 			// 培训编号
+				// 			localStorage.setItem("trainNo",data.trainNo);
+				// 			// 考试编号
+				// 			localStorage.setItem("examinationNo",data.examinationNo);
+				// 			// 工种岗位
+				// 			localStorage.setItem("workType",data.workType);
 
-							// 获取培训类别、培训层次
-							localStorage.setItem("trainType",data.trainType);
-              localStorage.setItem("trainLevel",data.trainLevel);
+				// 			// 获取培训类别、培训层次
+				// 			localStorage.setItem("trainType",data.trainType);
+        //       localStorage.setItem("trainLevel",data.trainLevel);
 
-							// 考试类型（1：在线考试，2：模拟考试）
-              localStorage.setItem("examinationType",'1');
-              Indicator.close();
-							this.$router.push('/examConfirm');
-						} else {
-              Indicator.close();
-              Toast("您已经参加过该考试");
-						}
-					} else {
-            Indicator.close();
-            Toast(data.msg);
-					}
-				}).catch(err => {
-          Indicator.close();
-          Toast('出现异常');
-				});
+				// 			// 考试类型（1：在线考试，2：模拟考试）
+        //       localStorage.setItem("examinationType",'1');
+        //       Indicator.close();
+				// 			this.$router.push('/examConfirm');
+				// 		} else {
+        //       Indicator.close();
+        //       Toast("您已经参加过该考试");
+				// 		}
+				// 	} else {
+        //     Indicator.close();
+        //     Toast(data.msg);
+				// 	}
+				// }).catch(err => {
+        //   Indicator.close();
+        //   Toast('出现异常');
+				// });
 			},
 
 			// 模拟考试
@@ -127,7 +132,7 @@
 				// 考试类型（1：在线考试，2：模拟考试）
 				localStorage.setItem("examinationType",'2');
 				// 清空工种岗位
-				localStorage.setItem("workType",'');
+				localStorage.setItem("questionBank",'');
 				this.$router.push('/examConfirm');
 			},
 

@@ -15,7 +15,7 @@
 				<input type="hidden" v-model="hiddenData" >
 				<div class="exam-type">
                     <mt-cell title="题目类别" is-link @click.native="questionsTypeOptionsClick">
-                        <span>{{optionValue}}</span>
+                        <span style="color: green">{{optionValue}}</span>
                     </mt-cell>
                 </div>
 				<div class="all-count" v-if="questiones.length !== 0">
@@ -34,7 +34,16 @@
 					</mt-popup>
 				</div>
                 <mt-popup v-model="pullDownVisible" position="bottom" style="width:100%">
-                	<mt-picker @change="onValuesChange" :slots="questionsTypeOptions" value-key="value" ></mt-picker>
+                	<mt-picker :slots="questionsTypeOptions" value-key="value" :visible-item-count="5" :show-toolbar="true" ref="picker">
+						<div style="display:table;width:100vw">
+							<div style="text-align:left;padding:5px;width:50vw;display:table-cell;">
+								<mt-button @click="questionsTypeOptionsClick" type="primary" size="small">取消</mt-button>
+							</div>
+							<div style="text-align:right;padding:5px;width:50vw;display:table-cell;">
+								<mt-button @click="onValuesChange" type="primary" size="small">确认</mt-button>
+							</div>
+						</div>
+					</mt-picker>
                 </mt-popup>
 				
 			</div>
@@ -165,12 +174,32 @@
 		},
 		methods: {
 			questionsTypeOptionsClick() {
-				this.pullDownVisible = true;
+				if(this.pullDownVisible) {
+					this.pullDownVisible = false;
+				} else {
+					this.pullDownVisible = true;
+				}
+				
 			},
 			getQueList(indexTemp) {
 				this.popupVisible = false;
 				this.index = indexTemp;
 				this.item = this.questiones[this.index];
+
+				if(this.questiones.length === 1) {
+					this.downBtnFlg = true;
+					this.upBtnFlg = true;
+				} else {
+					if(indexTemp === this.questiones.length - 1) {
+						this.downBtnFlg = true;
+						this.upBtnFlg = false;
+					}
+
+					if(indexTemp === 0) {
+						this.upBtnFlg = false;
+						this.upBtnFlg = true;
+					}
+				}
 			},
 			showModal: function (){
             	this.popupVisible = true;
@@ -274,10 +303,10 @@
 				this.hiddenData++;
 			},
 			// 题目类型改变时
-			onValuesChange(picker, values) {
-            if (picker.getSlotValue(0) != null) {
-					this.optionKey = picker.getValues()[0].key;
-					this.optionValue = picker.getValues()[0].value;
+			onValuesChange() {
+            if (this.$refs.picker.getSlotValue(0) != null) {
+					this.optionKey = this.$refs.picker.getValues()[0].key;
+					this.optionValue = this.$refs.picker.getValues()[0].value;
 					this.pullDownVisible = false;
 
 					if(this.allquestions) {

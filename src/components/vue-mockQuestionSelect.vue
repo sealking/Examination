@@ -44,7 +44,7 @@
 					examinationType: "2",
 					studentNo: localStorage.getItem("studentNo"),
 					questionType: localStorage.getItem("questionType"),
-					workType: localStorage.getItem("workType")
+					questionBankId: localStorage.getItem("questionBank")
 				};
 				Indicator.open('试题生成中...');
 				this.postAxios(this.getQuestionsUrl, parms).then(data => {
@@ -100,7 +100,7 @@
 		mounted() {
 			let parm = {
 				studentNo: localStorage.getItem("studentNo"),
-				workType: localStorage.getItem("workType"),
+				questionBank: localStorage.getItem("questionBank"),
 			}
 			this.postAxios(this.getExamListUrl, parm).then(data => {
 					this.mockExamTableData = data;
