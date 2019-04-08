@@ -29,18 +29,78 @@
 </template>
 
 <script>
+  import { Toast } from 'mint-ui';
 	export default {
     data() {
       return {
-        mySelected: 'index'
+        mySelected: 'index',
+        // 登录ControllerURL（在线）
+				loginUrl: "/login/userLogin"
       }
     },
     methods: {
       goto (path) {
-        this.$router.replace(path)
+        if('/myPage' === path) {
+          let options = {
+            userIdcard: localStorage.getItem("userIdcard")
+          };
+
+          this.postAxios(this.loginUrl, options).then(data => {
+            if(data.returnCode === '0') {
+              this.$router.replace(path);
+            } else {
+              this.exit();
+              Toast("无效用户，请于管理员联系");
+            }
+          }).catch(err => {
+            Toast('出现异常');
+          });
+          
+        } else {
+          this.$router.replace(path);
+        }
       },
+
       isCurrent (path) {
         return this.$route.path === path
+      },
+
+      exit() {
+        // 学员编号
+				localStorage.setItem("studentNo", '');
+				// 设置用户的身份证号
+				localStorage.setItem("userIdcard",'');
+				// 设置姓名
+        localStorage.setItem("userName",'');
+        // 设置性别
+        localStorage.setItem("userSex",'');
+				// 设置所属单位
+				localStorage.setItem("userUnits",'');
+				// 设置所属单位ID
+				localStorage.setItem("userUnitsId",'');
+				// 试题信息
+				localStorage.setItem("questionInfoList",JSON.stringify([]));
+				// 考试分钟数
+				localStorage.setItem("examinationMinute",0);
+				// 培训编号
+				localStorage.setItem("trainNo",'');
+				// 考试编号
+				localStorage.setItem("examinationNo",'');
+				// 考试类型（1：在线考试，2：模拟考试）
+				localStorage.setItem("examinationType",'');
+				// 分数
+				localStorage.setItem("score", 0);
+				// 回答的题数
+				localStorage.setItem("answerNumber", 0);
+				// 总题数
+				localStorage.setItem("totalNumber", 0);
+				// 题库编号
+				localStorage.setItem("questionBank",'');
+				// 设置学员类别
+				localStorage.setItem("userType",'');
+				// 考试设定时间
+				localStorage.setItem("questionsSettingDate",'');
+				this.$router.push('/login');
       }
     },
   }

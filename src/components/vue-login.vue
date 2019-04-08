@@ -60,7 +60,7 @@
 						// 跳转到登录确认页面
 						this.$router.replace ('/');
 					}else{
-						Toast(data.msg,);
+						Toast(data.msg);
 					}
 				}).catch(err => {
 					Toast('出现异常');

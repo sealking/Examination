@@ -72,17 +72,33 @@
 				// // 获取在线考试试题
 				// getQuestionsUrl: "/examination/getQuestions",
 				// 获取培训信息
-				getTrainUrl: "/examination/getTrainByNo"
+        getTrainUrl: "/examination/getTrainByNo",
+        // 登录ControllerURL（在线）
+				loginUrl: "/login/userLogin"
 			}
 		},
 		methods: {
+      
 			// 在线考试
-			onlineExam() {
-        // 考试类型（1：在线考试，2：模拟考试）
-				localStorage.setItem("examinationType",'1');
-				// 清空题库
-				localStorage.setItem("questionBank",'');
-				this.$router.push('/examConfirm');
+			onlineExam() { 
+        let options = {
+          userIdcard: localStorage.getItem("userIdcard")
+        };
+
+        this.postAxios(this.loginUrl, options).then(data => {
+          if(data.returnCode === '0') {
+            // 考试类型（1：在线考试，2：模拟考试）
+            localStorage.setItem("examinationType",'1');
+            // 清空题库
+            localStorage.setItem("questionBank",'');
+            this.$router.push('/examConfirm');
+          } else {
+            this.exit();
+          }
+        }).catch(err => {
+          Toast('出现异常');
+        });
+        
 				// // 获取在线考试试题
 				// let parms = {
 				// 	examinationType: "1",
@@ -129,11 +145,23 @@
 
 			// 模拟考试
 			mockExam() {
-				// 考试类型（1：在线考试，2：模拟考试）
-				localStorage.setItem("examinationType",'2');
-				// 清空工种岗位
-				localStorage.setItem("questionBank",'');
-				this.$router.push('/examConfirm');
+        let options = {
+          userIdcard: localStorage.getItem("userIdcard")
+        };
+
+        this.postAxios(this.loginUrl, options).then(data => {
+          if(data.returnCode === '0') {
+            // 考试类型（1：在线考试，2：模拟考试）
+          localStorage.setItem("examinationType",'2');
+          // 清空工种岗位
+          localStorage.setItem("questionBank",'');
+          this.$router.push('/examConfirm');
+          } else {
+            this.exit();
+          }
+        }).catch(err => {
+          Toast('出现异常');
+        });
 			},
 
 			// 离线学习
@@ -142,8 +170,60 @@
       },
       // 文件学习
 			fileDownload() {
-				this.$router.push('/fileDownload');
-			}
+      let options = {
+          userIdcard: localStorage.getItem("userIdcard")
+        };
+
+        this.postAxios(this.loginUrl, options).then(data => {
+          if(data.returnCode === '0') {
+            this.$router.push('/fileDownload');
+          } else {
+            this.exit();
+          }
+        }).catch(err => {
+          Toast('出现异常');
+        });
+      },
+      
+      // 用户有效性校验
+      exit() {
+        // 学员编号
+        localStorage.setItem("studentNo", '');
+        // 设置用户的身份证号
+        localStorage.setItem("userIdcard",'');
+        // 设置姓名
+        localStorage.setItem("userName",'');
+        // 设置性别
+        localStorage.setItem("userSex",'');
+        // 设置所属单位
+        localStorage.setItem("userUnits",'');
+        // 设置所属单位ID
+        localStorage.setItem("userUnitsId",'');
+        // 试题信息
+        localStorage.setItem("questionInfoList",JSON.stringify([]));
+        // 考试分钟数
+        localStorage.setItem("examinationMinute",0);
+        // 培训编号
+        localStorage.setItem("trainNo",'');
+        // 考试编号
+        localStorage.setItem("examinationNo",'');
+        // 考试类型（1：在线考试，2：模拟考试）
+        localStorage.setItem("examinationType",'');
+        // 分数
+        localStorage.setItem("score", 0);
+        // 回答的题数
+        localStorage.setItem("answerNumber", 0);
+        // 总题数
+        localStorage.setItem("totalNumber", 0);
+        // 题库编号
+        localStorage.setItem("questionBank",'');
+        // 设置学员类别
+        localStorage.setItem("userType",'');
+        // 考试设定时间
+        localStorage.setItem("questionsSettingDate",'');
+        Toast("无效用户，请于管理员联系");
+        this.$router.push('/login');
+      }
 		}
 	}
 </script>
