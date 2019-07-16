@@ -14,7 +14,7 @@
 					<span style="text-align:right">上传日期</span>
 				</mt-cell>
 				<mt-popup v-model="popupVisible" position="bottom" style="width:100vw">
-					<mt-picker :slots="fileTypeOptions"  valueKey="value" :visible-item-count="5" :show-toolbar="true" ref="picker" >
+					<mt-picker :slots="fileTypeOptions"  valueKey="value" :visible-item-count="9" :show-toolbar="true" ref="picker" >
 						<div style="display:table;width:100vw">
 							<div style="text-align:left;padding:5px;width:50vw;display:table-cell;">
 								<mt-button @click="showModal" type="primary" size="small">取消</mt-button>

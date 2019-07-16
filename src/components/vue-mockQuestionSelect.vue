@@ -42,6 +42,7 @@
 			randomOnClick() {
 				let parms = {
 					examinationType: "2",
+					trainNo: localStorage.getItem("trainNo"),
 					studentNo: localStorage.getItem("studentNo"),
 					questionType: localStorage.getItem("questionType"),
 					questionBankId: localStorage.getItem("questionBank")
@@ -55,8 +56,8 @@
 						localStorage.setItem("examinationMinute",data.examinationMinute);
 						// 模拟考试设定时间
 						localStorage.setItem("questionsSettingDate",data.settingDate);
-						// 培训编号
-						localStorage.setItem("trainNo",data.trainNo);
+						// // 培训编号
+						// localStorage.setItem("trainNo",data.trainNo);
 						Indicator.close();
 						this.$router.replace('examIndex');
 					} else {
@@ -71,6 +72,7 @@
 			selectOnClick(item) {
 				let parms = {
 					studentNo: item.studentNo,
+					trainNo: item.trainNo,
 					questionsNo: item.questionsNo,
 					settingDate: item.settingDate
 				};
@@ -99,6 +101,7 @@
 		},
 		mounted() {
 			let parm = {
+				trainNo: localStorage.getItem("trainNo"),
 				studentNo: localStorage.getItem("studentNo"),
 				questionBank: localStorage.getItem("questionBank"),
 			}

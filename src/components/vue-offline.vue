@@ -34,7 +34,7 @@
 					</mt-popup>
 				</div>
                 <mt-popup v-model="pullDownVisible" position="bottom" style="width:100%">
-                	<mt-picker :slots="questionsTypeOptions" value-key="value" :visible-item-count="5" :show-toolbar="true" ref="picker">
+                	<mt-picker :slots="questionsTypeOptions" value-key="value" :visible-item-count="9" :show-toolbar="true" ref="picker">
 						<div style="display:table;width:100vw">
 							<div style="text-align:left;padding:5px;width:50vw;display:table-cell;">
 								<mt-button @click="questionsTypeOptionsClick" type="primary" size="small">取消</mt-button>

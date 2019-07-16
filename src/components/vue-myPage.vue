@@ -28,7 +28,7 @@
 				<span style="color: #ffffff">{{trainName}}</span>
 			</mt-cell>
 			<mt-popup v-model="trainListVisible" position="bottom" style="width:100vw">
-				<mt-picker :slots="trainList" valueKey="value" :visible-item-count="5" :show-toolbar="true" ref="picker">
+				<mt-picker :slots="trainList" valueKey="value" :visible-item-count="9" :show-toolbar="true" ref="picker">
 					<div style="display:table;width:100vw">
 						<div style="text-align:left;padding:5px;width:50vw;display:table-cell;">
 							<mt-button @click="handleClickTrain" type="primary" size="small">取消</mt-button>

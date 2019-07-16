@@ -55,7 +55,7 @@ function apiAxios (method, url, params) {
     // `data` 是作为请求主体被发送的数据
     params: method === 'GET' || method === 'DELETE' ? params : null,
     data: method === 'POST' || method === 'PUT' ? qs.stringify(params) : null,
-    timeout: 10000
+    timeout: 30000
 }
 
   // 注意**Promise**使用(Promise首字母大写)

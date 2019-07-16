@@ -3,14 +3,14 @@
     <div class="top">
       <div class="top-blank"></div>
       <div class="top-mid">
-        <span class="title-font">安全生产在线模拟考试平台</span>
+        <span class="title-font">玲珑金矿安全知识学习考试平台</span>
       </div>
       <div class="top-blank"></div>
     </div>
   	<!-- <div><img class="banner-image" src="../assets/img/banner.png" ></div> -->
 		<div class="banner">
       <div class="banner-text">
-        <span class="banner-font">关注安全 关注生命</span>
+        <span class="banner-font" ><img src="../assets/img/title.png"></span>
       </div>
     </div>
     <div class="div-menu-blank"></div>
