@@ -251,34 +251,46 @@
 			},
 
 			handleClickTrainingList() {
+				//if(this.examinationList !== '1') {
 				if (this.trainingListVisible) {
 					this.trainingListVisible = false;
 				} else {
 					this.trainingListVisible = true;
 				}
+					
+				//}
 			},
 
 			handleClickTrainingType() {
-				// if (this.trainingTypeVisible) {
-				// 	this.trainingTypeVisible = false;
-				// } else {
-				// 	this.trainingTypeVisible = true;
-				// }
+				//if(this.examinationType !== '1') {
+				if (this.trainingTypeVisible) {
+					this.trainingTypeVisible = false;
+				} else {
+					this.trainingTypeVisible = true;
+				}
+					
+				//}
 			},
 			
 			handleClickTrainingLevel() {
-				// if(this.trainingLevelVisible) {
-				// 	this.trainingLevelVisible = false;
-				// } else {
-				// 	this.trainingLevelVisible = true;
-				// }
+				//if(this.examinationType !== '1') {
+				if(this.trainingLevelVisible) {
+					this.trainingLevelVisible = false;
+				} else {
+					this.trainingLevelVisible = true;
+				}
+					
+				//}
 			},
 			handleClickWorkType() {
+				//if(this.examinationType !== '1') {
 				if(this.workTypeVisible) {
 					this.workTypeVisible = false;
 				} else {
 					this.workTypeVisible = true;
 				}
+					
+				//}
 			},
 			handleClickQuestions() {
 				if(this.trainingListKey === '0') {
@@ -309,54 +321,20 @@
 				
 			},
 			onListValuesChange() {
-				this.trainingTypeKey = '0';
-				this.trainingType = '请选择';
-				this.trainingLevelKey = '0';
-				this.trainingLevel = '请选择';
-				this.workTypeKey = '0';
-				this.workType = '请选择';
-				this.questionsKey = '0';
-				this.questions = '请选择';
-
-				let trainType = "";
-				let trainTypeName = "";
-				let trainLevel = "";
-				let trainLevelName = "";
 				if (this.$refs.trainingListPicker.getSlotValue(0) != null) {
 					this.trainingListKey = this.$refs.trainingListPicker.getValues()[0].key;
 					this.trainingList = this.$refs.trainingListPicker.getValues()[0].value;
-					trainType = this.$refs.trainingListPicker.getValues()[0].trainType;
-					trainTypeName = this.$refs.trainingListPicker.getValues()[0].trainTypeName;
-					trainLevel = this.$refs.trainingListPicker.getValues()[0].trainLevel;
-					trainLevelName = this.$refs.trainingListPicker.getValues()[0].trainLevelName;
 					this.trainingListVisible = false;
 				} else {
 					this.trainingList = "";
 				}
 
 				// localStorage.setItem("trainNo",this.trainingListKey);
-				this.trainingTypeOptions[0].values.forEach(item => {
-					if (item.key === trainType) {
-						this.trainingTypeKey = trainType;
-						this.trainingType = trainTypeName;
-					}
-				});
-
-				this.trainingLevelOptions[0].values.forEach(item => {
-					if (item.key === trainLevel) {
-						this.trainingLevelKey = trainLevel;
-						this.trainingLevel = trainLevelName;
-					}
-				});
-
 				if(this.examinationType === '2') {
 					localStorage.setItem("trainingListKey",this.trainingListKey);
-					localStorage.setItem("trainingTypeKey",this.trainingTypeKey);
-					localStorage.setItem("trainingLevelKey",this.trainingLevelKey);
-					localStorage.setItem("workTypeKey",this.workTypeKey);
 				}
 
-				this.getQuestionsValues();
+				//this.getQuestionsValues();
 			},
 			onTypeValuesChange() {
 				if (this.$refs.trainingTypePicker.getSlotValue(0) != null) {
@@ -488,10 +466,10 @@
 
 			this.postAxios(this.getTrainByStuNoForExamUrl, parm).then(data => {
 				let i = 0;
-				let valuesInfo = [{ key: '0', value: '请选择', pxlb: '', pxlbName: '', pxcc: '', pxccName: '' }];
+				let valuesInfo = [{ key: '0', value: '请选择' }];
 				// 培训列表
 				data.forEach(dataListInfo => {
-					var value = {key: dataListInfo.no, value: dataListInfo.name, trainType: dataListInfo.trainType, trainTypeName: dataListInfo.trainTypeName, trainLevel: dataListInfo.trainLevel, trainLevelName: dataListInfo.trainLevelName };
+					var value = {key: dataListInfo.no, value: dataListInfo.name };
 					valuesInfo.push(value);
 
 					i++;
@@ -510,7 +488,6 @@
 					this.trainingListKey = tmpTrainingListKey;
 					this.trainingList = tmpTrainingList;
 
-					this.getQuestionsValues();
 					// localStorage.setItem("trainNo",this.trainingListKey);
 				} else {
 					this.trainingListKey = '0';
@@ -523,7 +500,7 @@
 			// 获取培训类别
 			this.postAxios(this.getDataTypeInfoUrl, {typeCode: 'pxlb'}).then(data => {
 				let i = 0;
-				let valuesInfo = [{ key: '0', value: '请选择' }];
+				let valuesInfo = [{ key: '0', value: '请选择'}];
 				data.dataTypeList.forEach(dataTypeInfo => {
 					valuesInfo.push(dataTypeInfo);
 					i++;
